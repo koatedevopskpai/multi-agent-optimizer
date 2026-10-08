@@ -9,6 +9,25 @@ never touch the schedule calculation; they only add commentary, risk synthesis
 and suggestions when a provider is configured. No keys, no network, zero
 surprises by default.
 
+```
+tasks ─▶ CPM engine (pure) ─▶ Schedule (ES/EF/LS/LF, slack, critical path)
+                              │
+        ┌─────────────────────┼──────────────────────┐
+        ▼                     ▼                      ▼
+  SchedulerAgent        RiskAgent()           OptimiserAgent()
+    (order view)       (HIGH/MED risks)      (resource moves)
+        │                     │                      │
+        └───────── Orchestrator (MultiAgentOptimizer)
+                              │
+                     LLM enrichment (optional)
+                circuit breaker + retry/backoff + Pydantic-validated
+                → deterministic fallback on any failure
+```
+
+Everything on the engine side is unit-tested CPM; every LLM call is wrapped in
+`resilience.py` (retry-with-backoff, circuit breaker, Pydantic v2 validation,
+deterministic fallback).
+
 ## What it does
 
 - **CPM engine** (`multi_agent_optimizer.cpm`): forward/backward pass,
@@ -17,7 +36,11 @@ surprises by default.
 - **RiskAgent**: flags critical-path tasks `HIGH`, long tasks `MED`.
 - **OptimiserAgent**: proposes resource-adding moves on the critical path.
 - **SchedulerAgent**: renders the annotated schedule.
-- **Orchestrator** (`MultiAgentOptimizer.optimize()`): CPM first, agents over it.
+- **Resilience** (`resilience.py`): retry-with-backoff, a circuit breaker, and
+  Pydantic-v2-validated LLM calls that fall back to deterministic output when a
+  provider fails or returns invalid JSON.
+- **Orchestrator** (`MultiAgentOptimizer.optimize()`): CPM first, agents over it,
+  LLM enrichment optional.
 
 ## Quick start
 

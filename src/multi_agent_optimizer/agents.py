@@ -1,19 +1,21 @@
-"""Agents: deterministic-first, LLM-on-top.
+"""Agents: deterministic-first, LLM-on-top, resilience on the edges.
 
-The risk and optimisation outputs are fully deterministic — they come from the
-CPM engine. The LLM is an optional enrichment layer (configurable provider,
-default is a no-op so everything runs without API keys).
+Risk and optimisation outputs are fully deterministic — they come from the CPM
+engine. LLM enrolment is optional and goes through a circuit-broken,
+retry-with-backoff, Pydantic-validated call with a deterministic fallback
+(see `resilience.py`).
 """
 
 from __future__ import annotations
 
-import json
 import os
 import urllib.request
-from dataclasses import dataclass
 from typing import Protocol
 
+from pydantic import BaseModel
+
 from .cpm import Schedule
+from .resilience import CircuitBreaker, safe_llm_json
 
 __all__ = [
     "LLMClient",
@@ -40,11 +42,7 @@ class NoopLLM:
 
 
 class OpenAICompatibleLLM:
-    """Minimal OpenAI-compatible chat client (stdlib only).
-
-    Works with OpenAI, OpenRouter, vLLM, Ollama and Azure-OpenAI-compatible
-    endpoints via ``base_url``/``model``.
-    """
+    """Minimal OpenAI-compatible chat client (stdlib only)."""
 
     def __init__(self, model: str, base_url: str = "https://api.openai.com/v1", api_key: str = ""):
         self.model = model
@@ -52,6 +50,8 @@ class OpenAICompatibleLLM:
         self.api_key = api_key
 
     def chat(self, system: str, user: str) -> str:
+        import json
+
         body = json.dumps(
             {
                 "model": self.model,
@@ -60,6 +60,7 @@ class OpenAICompatibleLLM:
                     {"role": "user", "content": user},
                 ],
                 "temperature": 0.0,
+                "response_format": {"type": "json_object"},
             }
         ).encode("utf-8")
         request = urllib.request.Request(
@@ -71,16 +72,14 @@ class OpenAICompatibleLLM:
             },
         )
         with urllib.request.urlopen(request, timeout=60) as response:
-            payload = json.loads(response.read().decode("utf-8"))
+            import json as _json
+
+            payload = _json.loads(response.read().decode("utf-8"))
         return payload["choices"][0]["message"]["content"]
 
 
 def llm_from_env(prefix: str = "LLM") -> LLMClient:
-    """Build a client from env. Empty provider => deterministic no-op mode.
-
-    Providers: openai / openrouter / vllm / ollama / azure-compatible (all use
-    the OpenAI chat API shape). `vertex` raises until wired (see README).
-    """
+    """Build a client from env. Empty provider => deterministic no-op mode."""
     provider = os.getenv(f"{prefix}_PROVIDER", "").strip().lower()
     if not provider:
         return NoopLLM()
@@ -95,27 +94,36 @@ def llm_from_env(prefix: str = "LLM") -> LLMClient:
     )
 
 
-@dataclass
-class Risk:
+class Risk(BaseModel):
     task: str
     detail: str
     level: str  # HIGH | MED | LOW
     deterministic: bool = True
 
 
-@dataclass
-class Suggestion:
+class Suggestion(BaseModel):
     task: str
     action: str
     expected_saving_days: int
     deterministic: bool = True
 
 
-class SchedulerAgent:
-    """Owns the schedule view: early/late times, slack, critical path."""
+class _Notes(BaseModel):
+    notes: str
 
+
+class _Note(BaseModel):
+    note: str
+
+
+class _Thought(BaseModel):
+    thought: str
+
+
+class SchedulerAgent:
     def __init__(self, llm: LLMClient | None = None):
         self._llm = llm or NoopLLM()
+        self._breaker = CircuitBreaker()
 
     def run(self, schedule: Schedule) -> str:
         rows = [
@@ -129,53 +137,61 @@ class SchedulerAgent:
         table = "\n".join(rows)
         if isinstance(self._llm, NoopLLM):
             return table
-        return self._llm.chat(
-            "You summarise a CPM schedule into 2-3 plain-English bullets.",
+        enriched = safe_llm_json(
+            self._llm,
+            _Notes,
+            "You summarise a CPM schedule into one JSON object {\"notes\": \"...\"}.",
             f"Project duration {schedule.project_duration} days.\n{table}",
+            fallback=_Notes(notes=table),
+            breaker=self._breaker,
         )
+        return enriched.notes
 
 
 class RiskAgent:
-    """Deterministic risk view, LLM commentary optional."""
-
     def __init__(self, llm: LLMClient | None = None):
         self._llm = llm or NoopLLM()
+        self._breaker = CircuitBreaker()
 
     def evaluate(self, schedule: Schedule) -> list[Risk]:
-        risks = []
+        risks: list[Risk] = []
         for task in schedule.tasks.values():
             if task.is_critical:
                 risks.append(
-                    Risk(task.id, "on the critical path: any delay extends the project", "HIGH")
+                    Risk(task=task.id, detail="on the critical path: any delay extends the project", level="HIGH")
                 )
             elif task.duration >= 5:
                 risks.append(
                     Risk(
-                        task.id,
-                        f"long task ({task.duration}d) with slack {task.slack}d: slippage eats buffer",
-                        "MED",
+                        task=task.id,
+                        detail=f"long task ({task.duration}d) with slack {task.slack}d: slippage eats buffer",
+                        level="MED",
                     )
                 )
         risks.sort(key=lambda r: {"HIGH": 0, "MED": 1, "LOW": 2}[r.level])
-        if isinstance(self._llm, NoopLLM):
-            return risks
-        summary = self._llm.chat(
-            "You are a project risk reviewer. One short paragraph.",
-            "Risks: " + json.dumps([r.__dict__ for r in risks]),
-        )
-        risks.append(Risk("llm-note", summary, "LOW", deterministic=False))
+
+        if not isinstance(self._llm, NoopLLM):
+            payload = ",".join(r.model_dump_json() for r in risks)
+            note = safe_llm_json(
+                self._llm,
+                _Note,
+                'You are a project risk reviewer. Reply JSON {"note": "..."}.',
+                f"Risks: [{payload}]",
+                fallback=_Note(note=""),
+                breaker=self._breaker,
+            )
+            if note.note:
+                risks.append(Risk(task="llm-note", detail=note.note, level="LOW", deterministic=False))
         return risks
 
 
 class OptimiserAgent:
-    """Proposes schedule improvements. Deterministic heuristic: shorten the
-    critical path by adding resources to critical tasks."""
-
     def __init__(self, llm: LLMClient | None = None):
         self._llm = llm or NoopLLM()
+        self._breaker = CircuitBreaker()
 
     def propose(self, schedule: Schedule) -> list[Suggestion]:
-        suggestions = []
+        suggestions: list[Suggestion] = []
         for task in schedule.tasks.values():
             if not task.is_critical or task.duration <= 1:
                 continue
@@ -187,13 +203,19 @@ class OptimiserAgent:
                     expected_saving_days=saving,
                 )
             )
-        if isinstance(self._llm, NoopLLM):
-            return suggestions
-        thoughts = self._llm.chat(
-            "You are a schedule optimisation coach. Short advice, no code.",
-            "Suggestions: " + json.dumps([s.__dict__ for s in suggestions]),
-        )
-        suggestions.append(
-            Suggestion("llm-note", thoughts, 0, deterministic=False)
-        )
+
+        if not isinstance(self._llm, NoopLLM):
+            payload = ",".join(s.model_dump_json() for s in suggestions)
+            thought = safe_llm_json(
+                self._llm,
+                _Thought,
+                'You are a schedule optimisation coach. Reply JSON {"thought": "..."}.',
+                f"Suggestions: [{payload}]",
+                fallback=_Thought(thought=""),
+                breaker=self._breaker,
+            )
+            if thought.thought:
+                suggestions.append(
+                    Suggestion(task="llm-note", action=thought.thought, expected_saving_days=0, deterministic=False)
+                )
         return suggestions

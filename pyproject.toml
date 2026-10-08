@@ -9,6 +9,7 @@ description = "Deterministic-first project scheduling optimizer: CPM engine + LL
 readme = "README.md"
 requires-python = ">=3.10"
 license = { text = "MIT" }
+dependencies = ["pydantic>=2"]
 
 [project.optional-dependencies]
 dev = ["pytest>=8"]

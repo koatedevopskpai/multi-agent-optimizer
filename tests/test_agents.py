@@ -12,8 +12,8 @@ PROJECT = {
 
 class FakeLLM:
     def chat(self, system: str, user: str) -> str:
-        self.last = f"[fake] {system[:16]}...{user[:16]}"
-        return self.last
+        # Valid JSON for each agent schema (notes / note / thought).
+        return '{"notes": "fake summary", "note": "fake risk", "thought": "fake thought"}'
 
 
 def test_llm_enrichment_is_optional_and_non_blocking():
