@@ -1,0 +1,15 @@
+{
+  "name": "case_001_basic_cpm",
+  "project": {
+    "A": { "duration": 3 },
+    "B": { "duration": 2, "dependencies": ["A"] },
+    "C": { "duration": 4, "dependencies": ["A"] },
+    "D": { "duration": 2, "dependencies": ["B"] },
+    "E": { "duration": 1, "dependencies": ["C"] },
+    "F": { "duration": 3, "dependencies": ["D", "E"] }
+  },
+  "expected": {
+    "project_duration": 11,
+    "critical_path": ["A", "C", "E", "F"]
+  }
+}

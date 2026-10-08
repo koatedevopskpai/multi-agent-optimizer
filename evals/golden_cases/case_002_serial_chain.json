@@ -1,0 +1,12 @@
+{
+  "name": "case_002_serial_chain",
+  "project": {
+    "P1": { "duration": 3 },
+    "P2": { "duration": 4, "dependencies": ["P1"] },
+    "P3": { "duration": 5, "dependencies": ["P2"] }
+  },
+  "expected": {
+    "project_duration": 12,
+    "critical_path": ["P1", "P2", "P3"]
+  }
+}
