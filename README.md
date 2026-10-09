@@ -1,5 +1,7 @@
 # multi-agent-optimizer
 
+[![CI](https://img.shields.io/github/actions/workflow/status/koatedevopskpai/multi-agent-optimizer/ci.yml?branch=main)](https://github.com/koatedevopskpai/multi-agent-optimizer/actions) [coverage ≥80% enforced in CI]
+
 **Deterministic-first project scheduling optimizer.** A unit-tested
 **Critical Path Method (CPM) engine** decides; three LLM agents — **Scheduler,
 Risk, Optimiser** — enrich and advise under an **Orchestrator**.
