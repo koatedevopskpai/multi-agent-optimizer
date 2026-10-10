@@ -101,6 +101,25 @@ evals/
 tests/              # unit tests (pytest)
 ```
 
+## LangGraph integration (optional)
+
+The deterministic engine also ships as an **optional LangGraph `StateGraph`**
+(`plan → risk → optimise`) — same design, orchestrated with LangGraph:
+
+```bash
+pip install -e ".[langgraph]"
+```
+
+```python
+from multi_agent_optimizer.lg_graph import run_langgraph
+
+state = run_langgraph(project)
+print(state["duration"], state["critical_path"], state["risks"])
+```
+
+Without `langgraph` installed the core package still works; only
+`lg_graph.build_graph()` requires the extra.
+
 ## Roadmap
 
 - Vertex AI / Bedrock clients behind the same `LLMClient` protocol
