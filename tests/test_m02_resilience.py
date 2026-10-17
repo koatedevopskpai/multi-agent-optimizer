@@ -173,6 +173,7 @@ def test_parse_validated_rejects_invalid_output_directly():
         (_rate_limit, "rate_limit"),
         (_connection_reset, "connection_reset"),
     ],
+    ids=["timeout", "rate_limit", "connection_reset"],
 )
 def test_provider_errors_fall_back_after_two_attempts(error_factory, name):
     llm = FailingLLM(error_factory)
@@ -289,6 +290,7 @@ def _assert_same_schedule(left, right) -> None:
         (lambda: StaticLLM("not json"), "invalid_output"),
         (lambda: StaticLLM('{"notes": null, "note": null, "thought": null}'), "wrong_schema"),
     ],
+    ids=["timeout", "rate_limit", "repeated_failure", "invalid_output", "wrong_schema"],
 )
 def test_provider_failures_cannot_alter_scheduling_facts(llm_factory, name):
     control = _control_result()
