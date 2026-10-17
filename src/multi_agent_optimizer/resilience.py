@@ -11,7 +11,7 @@ import json
 import time
 from typing import Callable, TypeVar
 
-from pydantic import BaseModel, ValidationError
+from pydantic import BaseModel
 
 __all__ = [
     "CircuitOpenError",
@@ -31,19 +31,35 @@ class CircuitOpenError(RuntimeError):
 
 class CircuitBreaker:
     """Trips open after ``failure_threshold`` consecutive failures, then stays
-    open for ``reset_seconds``."""
+    open for ``reset_seconds``.
 
-    def __init__(self, failure_threshold: int = 3, reset_seconds: float = 30.0):
+    ``clock`` is injectable so tests can advance time without sleeping; it
+    defaults to ``time.monotonic``.
+    """
+
+    def __init__(
+        self,
+        failure_threshold: int = 3,
+        reset_seconds: float = 30.0,
+        *,
+        clock: Callable[[], float] | None = None,
+    ):
         if failure_threshold < 1:
             raise ValueError("failure_threshold must be >= 1")
         self._threshold = failure_threshold
         self._reset = reset_seconds
         self._failures = 0
         self._open_until = 0.0
+        self._clock = clock or time.monotonic
 
     @property
     def is_open(self) -> bool:
-        return time.monotonic() < self._open_until
+        return self._clock() < self._open_until
+
+    @property
+    def failure_count(self) -> int:
+        """Consecutive failures since the last success (observability)."""
+        return self._failures
 
     def call(self, fn: Callable[[], T]) -> T:
         if self.is_open:
@@ -53,7 +69,7 @@ class CircuitBreaker:
         except Exception:
             self._failures += 1
             if self._failures >= self._threshold:
-                self._open_until = time.monotonic() + self._reset
+                self._open_until = self._clock() + self._reset
             raise
         self._failures = 0
         return result
@@ -65,17 +81,20 @@ def retry_with_backoff(
     base_delay: float = 0.1,
     factor: float = 2.0,
     exceptions: tuple[type[Exception], ...] = (Exception,),
+    *,
+    sleep: Callable[[float], None] | None = None,
 ) -> T:
     if attempts < 1:
         raise ValueError("attempts must be >= 1")
+    sleeper = sleep or time.sleep
     last: Exception | None = None
     for i in range(attempts):
         try:
             return fn()
-        except exceptions as exc:  # type: ignore[misc]
+        except exceptions as exc:
             last = exc
             if i + 1 < attempts:
-                time.sleep(base_delay * (factor**i))
+                sleeper(base_delay * (factor**i))
     assert last is not None
     raise last
 
@@ -118,5 +137,5 @@ def safe_llm_json(
                 exceptions=(Exception,),
             )
         )
-    except (Exception, ValidationError):  # noqa: BLE001 - intentional fallback
+    except Exception:  # intentional: provider, parse and validation errors all fall back
         return fallback
