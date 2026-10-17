@@ -1,10 +1,10 @@
-# multi-agent-optimizer
+﻿# multi-agent-optimizer
 
-[![CI](https://img.shields.io/github/actions/workflow/status/koatedevopskpai/multi-agent-optimizer/ci.yml?branch=main)](https://github.com/koatedevopskpai/multi-agent-optimizer/actions) [coverage ≥80% enforced in CI]
+[![CI](https://img.shields.io/github/actions/workflow/status/koatedevopskpai/multi-agent-optimizer/ci.yml?branch=main)](https://github.com/koatedevopskpai/multi-agent-optimizer/actions) [coverage â‰¥80% enforced in CI]
 
 **Deterministic-first project scheduling optimizer.** A unit-tested
-**Critical Path Method (CPM) engine** decides; three LLM agents — **Scheduler,
-Risk, Optimiser** — enrich and advise under an **Orchestrator**.
+**Critical Path Method (CPM) engine** decides; three LLM agents â€” **Scheduler,
+Risk, Optimiser** â€” enrich and advise under an **Orchestrator**.
 
 Core principle: the optimisation hot path is **pure, reproducible math**. LLMs
 never touch the schedule calculation; they only add commentary, risk synthesis
@@ -12,18 +12,18 @@ and suggestions when a provider is configured. No keys, no network, zero
 surprises by default.
 
 ```
-tasks ─▶ CPM engine (pure) ─▶ Schedule (ES/EF/LS/LF, slack, critical path)
-                              │
-        ┌─────────────────────┼──────────────────────┐
-        ▼                     ▼                      ▼
+tasks â”€â–¶ CPM engine (pure) â”€â–¶ Schedule (ES/EF/LS/LF, slack, critical path)
+                              â”‚
+        â”Œâ”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”¼â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”
+        â–¼                     â–¼                      â–¼
   SchedulerAgent        RiskAgent()           OptimiserAgent()
     (order view)       (HIGH/MED risks)      (resource moves)
-        │                     │                      │
-        └───────── Orchestrator (MultiAgentOptimizer)
-                              │
+        â”‚                     â”‚                      â”‚
+        â””â”€â”€â”€â”€â”€â”€â”€â”€â”€ Orchestrator (MultiAgentOptimizer)
+                              â”‚
                      LLM enrichment (optional)
                 circuit breaker + retry/backoff + Pydantic-validated
-                → deterministic fallback on any failure
+                â†’ deterministic fallback on any failure
 ```
 
 Everything on the engine side is unit-tested CPM; every LLM call is wrapped in
@@ -43,13 +43,16 @@ deterministic fallback).
 - **SchedulerAgent**: renders the annotated schedule.
 - **Resilience** (`resilience.py`): retry-with-backoff, a circuit breaker, and
   Pydantic-v2-validated LLM calls that fall back to deterministic output when a
-  provider fails or returns invalid JSON.
+  provider fails or returns invalid JSON. The schedule is computed before any
+  provider is consulted, so timeouts, rate limits, repeated failures and
+  malformed output cannot change scheduling facts â€” they only remove the
+  optional LLM notes.
 - **Orchestrator** (`MultiAgentOptimizer.optimize()`): CPM first, agents over it,
   LLM enrichment optional.
 
 ## Validation
 
-`python evals/evaluate.py` runs 11 golden cases — 7 valid projects and 4
+`python evals/evaluate.py` runs 11 golden cases â€” 7 valid projects and 4
 invalid ones that must raise `ProjectError`. Every valid case is checked for
 its expected duration and zero-slack set, for dependency/timing invariants,
 and against an independently written longest-path baseline. The report is
@@ -71,7 +74,7 @@ python evals/evaluate.py              # golden-case eval gate
 
 The coverage gate is 80%. Installing only `.[dev]` leaves `lg_graph.py` and
 part of `agents.py` unimported by the suite, so coverage falls below the gate
-— the `langgraph` extra is not optional for a green local run.
+â€” the `langgraph` extra is not optional for a green local run.
 
 ### Using the API
 
@@ -107,8 +110,25 @@ LLM_PROVIDER=openai LLM_MODEL=gpt-4o-mini LLM_API_KEY=sk-... LLM_BASE_URL=https:
 ```
 
 Set `LLM_PROVIDER=` (empty) to return to fully deterministic mode. **Vertex AI
-provider is on the roadmap** — see `evals/` and the CI gate for how the quality
+provider is on the roadmap** â€” see `evals/` and the CI gate for how the quality
 bar is enforced.
+
+### Failure behaviour
+
+Each agent call is retried once, then counted by a per-agent circuit breaker
+(3 consecutive failures opens it for 30 seconds). While the circuit is open,
+no provider call is made. Invalid JSON, wrong schemas, timeouts, HTTP 429 and
+connection failures all take the same documented fallback:
+
+| Agent | On failure |
+|---|---|
+| Scheduler | the deterministic schedule table |
+| Risk | no `llm-note`; CPM risks unchanged |
+| Optimiser | no `llm-note`; CPM suggestions unchanged |
+
+`CircuitBreaker` accepts an injectable `clock` and exposes `failure_count`, so
+opening and recovery can be tested without sleeping. The full failure matrix,
+including the core vs LangGraph comparison, is in `docs/M02.md`.
 
 ## Layout
 
@@ -122,13 +142,14 @@ evals/
   evaluate.py       # eval gate (blocks CI on mismatch)
 docs/
   M01.md            # validation design, invariants and limits
-tests/              # unit tests (pytest), incl. test_cpm_validation.py
+  M02.md            # failure matrix, fallbacks and resilience limits
+tests/              # unit tests (pytest), incl. test_cpm_validation.py, test_m02_resilience.py
 ```
 
 ## LangGraph integration (optional)
 
 The deterministic engine also ships as an **optional LangGraph `StateGraph`**
-(`plan → risk → optimise`) — same design, orchestrated with LangGraph:
+(`plan â†’ risk â†’ optimise`) â€” same design, orchestrated with LangGraph:
 
 ```bash
 pip install -e ".[langgraph]"
@@ -152,4 +173,4 @@ Without `langgraph` installed the core package still works; only
 
 ## Licence
 
-MIT — see [LICENSE](LICENSE). © 2026 Koate Kpai.
+MIT â€” see [LICENSE](LICENSE). Â© 2026 Koate Kpai.
