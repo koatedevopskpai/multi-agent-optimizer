@@ -40,7 +40,10 @@ deterministic fallback).
 - **SchedulerAgent**: renders the annotated schedule.
 - **Resilience** (`resilience.py`): retry-with-backoff, a circuit breaker, and
   Pydantic-v2-validated LLM calls that fall back to deterministic output when a
-  provider fails or returns invalid JSON.
+  provider fails or returns invalid JSON. The schedule is computed before any
+  provider is consulted, so timeouts, rate limits, repeated failures and
+  malformed output cannot change scheduling facts — they only remove the
+  optional LLM notes.
 - **Orchestrator** (`MultiAgentOptimizer.optimize()`): CPM first, agents over it,
   LLM enrichment optional.
 
@@ -88,6 +91,23 @@ Set `LLM_PROVIDER=` (empty) to return to fully deterministic mode. **Vertex AI
 provider is on the roadmap** — see `evals/` and the CI gate for how the quality
 bar is enforced.
 
+### Failure behaviour
+
+Each agent call is retried once, then counted by a per-agent circuit breaker
+(3 consecutive failures opens it for 30 seconds). While the circuit is open,
+no provider call is made. Invalid JSON, wrong schemas, timeouts, HTTP 429 and
+connection failures all take the same documented fallback:
+
+| Agent | On failure |
+|---|---|
+| Scheduler | the deterministic schedule table |
+| Risk | no `llm-note`; CPM risks unchanged |
+| Optimiser | no `llm-note`; CPM suggestions unchanged |
+
+`CircuitBreaker` accepts an injectable `clock` and exposes `failure_count`, so
+opening and recovery can be tested without sleeping. The full failure matrix,
+including the core vs LangGraph comparison, is in `docs/M02.md`.
+
 ## Layout
 
 ```
@@ -98,7 +118,9 @@ src/multi_agent_optimizer/
 evals/
   golden_cases/     # ground-truth schedules + expected critical paths
   evaluate.py       # eval gate (blocks CI on mismatch)
-tests/              # unit tests (pytest)
+docs/
+  M02.md            # failure matrix, fallbacks and resilience limits
+tests/              # unit tests (pytest), incl. test_m02_resilience.py
 ```
 
 ## LangGraph integration (optional)
