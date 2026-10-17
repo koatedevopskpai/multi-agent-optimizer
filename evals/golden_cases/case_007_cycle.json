@@ -1,0 +1,8 @@
+{
+  "name": "case_007_cycle",
+  "project": {
+    "A": { "duration": 1, "dependencies": ["B"] },
+    "B": { "duration": 1, "dependencies": ["A"] }
+  },
+  "expected_error": "cycle"
+}

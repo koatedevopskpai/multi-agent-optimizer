@@ -48,23 +48,42 @@ class Schedule:
 
 
 def build_tasks(raw: dict[str, dict]) -> dict[str, Task]:
-    """Validate and normalise a raw task dict into ``Task`` objects."""
+    """Validate and normalise a raw task dict into ``Task`` objects.
+
+    Raises:
+        ProjectError: for an empty project, unnamed tasks, a non-mapping task
+            definition, a missing/negative/non-integer duration, malformed or
+            duplicated dependencies, or a dependency on an unknown task.
+    """
+    if not isinstance(raw, dict):
+        raise ProjectError("project must be a mapping of task ids to task definitions")
     if not raw:
         raise ProjectError("project has no tasks")
 
     for key in raw:
         task = raw[key]
+        if not isinstance(key, str) or not key.strip():
+            raise ProjectError(f"task ids must be non-empty strings, got {key!r}")
+        if not isinstance(task, dict):
+            raise ProjectError(
+                f"task {key!r} must be a mapping, got {type(task).__name__}"
+            )
         if "duration" not in task:
             raise ProjectError(f"task {key!r} missing required key 'duration'")
         duration = task["duration"]
-        if not isinstance(duration, int) or duration < 0:
+        # bool is an int subclass; True is not a duration.
+        if isinstance(duration, bool) or not isinstance(duration, int) or duration < 0:
             raise ProjectError(
                 f"task {key!r} duration must be a non-negative int, got {duration!r}"
             )
         deps = task.get("dependencies", [])
         if not isinstance(deps, list) or not all(isinstance(d, str) for d in deps):
             raise ProjectError(f"task {key!r} dependencies must be a list of task ids")
+        if len(set(deps)) != len(deps):
+            raise ProjectError(f"task {key!r} has duplicate dependencies")
         for dep in deps:
+            if not dep:
+                raise ProjectError(f"task {key!r} has an empty dependency id")
             if dep not in raw:
                 raise ProjectError(f"task {key!r} depends on unknown task {dep!r}")
 
@@ -79,31 +98,39 @@ def build_tasks(raw: dict[str, dict]) -> dict[str, Task]:
 
 
 def _detect_cycle(tasks: dict[str, Task]) -> list[str]:
-    """Return a dependency cycle (as a path) if one exists, else empty."""
+    """Return a dependency cycle (as a path) if one exists, else empty.
+
+    Iterative rather than recursive: a valid schedule may contain thousands
+    of chained tasks, and a recursive DFS hits Python's recursion limit when
+    the chain is encountered deepest-first.
+    """
     WHITE, GREY, BLACK = 0, 1, 2
     colour = {t: WHITE for t in tasks}
-    path: list[str] = []
 
-    def dfs(node: str) -> list[str]:
-        colour[node] = GREY
-        path.append(node)
-        for dep in tasks[node].dependencies:
-            if colour[dep] == GREY:
-                start = path.index(dep)
-                return path[start:] + [dep]
-            if colour[dep] == WHITE:
-                cycle = dfs(dep)
-                if cycle:
-                    return cycle
-        path.pop()
-        colour[node] = BLACK
-        return []
-
-    for node in tasks:
-        if colour[node] == WHITE:
-            cycle = dfs(node)
-            if cycle:
-                return cycle
+    for root in tasks:
+        if colour[root] != WHITE:
+            continue
+        colour[root] = GREY
+        path: list[str] = [root]
+        # Each frame is (node, index of the next dependency to inspect).
+        stack: list[tuple[str, int]] = [(root, 0)]
+        while stack:
+            node, index = stack[-1]
+            deps = tasks[node].dependencies
+            if index >= len(deps):
+                colour[node] = BLACK
+                stack.pop()
+                path.pop()
+                continue
+            child = deps[index]
+            stack[-1] = (node, index + 1)
+            if colour[child] == GREY:
+                start = path.index(child)
+                return path[start:] + [child]
+            if colour[child] == WHITE:
+                colour[child] = GREY
+                path.append(child)
+                stack.append((child, 0))
     return []
 
 
@@ -129,16 +156,24 @@ def topological_order(tasks: dict[str, Task]) -> list[str]:
             indegree[child] -= 1
             if indegree[child] == 0:
                 ready.append(child)
+    if len(order) != len(tasks):
+        # Defensive: _detect_cycle above should have caught this.
+        raise ProjectError("dependency cycle detected")
     return order
 
 
 def schedule(raw: dict[str, dict], *, start: int = 0) -> Schedule:
     """Run the full CPM pass (forward, backward, slack, critical path)."""
-    if not isinstance(start, int) or start < 0:
+    if isinstance(start, bool) or not isinstance(start, int) or start < 0:
         raise ProjectError("'start' must be a non-negative int")
 
     tasks = build_tasks(raw)
     order = topological_order(tasks)
+
+    dependents: dict[str, list[str]] = {t: [] for t in tasks}
+    for task in tasks.values():
+        for dep in task.dependencies:
+            dependents[dep].append(task.id)
 
     # Forward pass: earliest start/finish.
     for node in order:
@@ -153,7 +188,7 @@ def schedule(raw: dict[str, dict], *, start: int = 0) -> Schedule:
     # Backward pass: latest start/finish + slack.
     for node in reversed(order):
         lf = project_end
-        for child in [c for c in tasks if node in tasks[c].dependencies]:
+        for child in dependents[node]:
             lf = min(lf, tasks[child].late_start)
         tasks[node].late_finish = lf
         tasks[node].late_start = lf - tasks[node].duration

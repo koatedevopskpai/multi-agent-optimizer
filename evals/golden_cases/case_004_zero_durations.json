@@ -1,0 +1,12 @@
+{
+  "name": "case_004_zero_durations",
+  "project": {
+    "M": { "duration": 0 },
+    "N": { "duration": 0, "dependencies": ["M"] },
+    "O": { "duration": 2, "dependencies": ["N"] }
+  },
+  "expected": {
+    "project_duration": 2,
+    "critical_path": ["M", "N", "O"]
+  }
+}

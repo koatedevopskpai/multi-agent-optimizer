@@ -20,3 +20,6 @@ Thumbs.db
 .coverage
 .coverage.*
 htmlcov/
+
+# generated eval report
+evals/EVAL_REPORT.md

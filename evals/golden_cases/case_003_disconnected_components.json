@@ -1,0 +1,13 @@
+{
+  "name": "case_003_disconnected_components",
+  "project": {
+    "A": { "duration": 2 },
+    "B": { "duration": 5, "dependencies": ["A"] },
+    "X": { "duration": 4 },
+    "Y": { "duration": 1, "dependencies": ["X"] }
+  },
+  "expected": {
+    "project_duration": 7,
+    "critical_path": ["A", "B"]
+  }
+}

@@ -33,8 +33,11 @@ deterministic fallback).
 ## What it does
 
 - **CPM engine** (`multi_agent_optimizer.cpm`): forward/backward pass,
-  ES/EF/LS/LF, slack/float, critical path, with dependency validation and
-  cycle detection. `schedule()` is deterministic and unit-tested.
+  ES/EF/LS/LF, slack/float, critical path, with strict input validation and
+  non-recursive cycle detection. Malformed projects (cycles, unknown or
+  duplicate dependencies, negative/non-integer durations, mistyped task
+  bodies) raise `ProjectError` instead of producing a schedule. `schedule()`
+  is deterministic and unit-tested, including schedules with 2000 tasks.
 - **RiskAgent**: flags critical-path tasks `HIGH`, long tasks `MED`.
 - **OptimiserAgent**: proposes resource-adding moves on the critical path.
 - **SchedulerAgent**: renders the annotated schedule.
@@ -44,14 +47,31 @@ deterministic fallback).
 - **Orchestrator** (`MultiAgentOptimizer.optimize()`): CPM first, agents over it,
   LLM enrichment optional.
 
+## Validation
+
+`python evals/evaluate.py` runs 11 golden cases — 7 valid projects and 4
+invalid ones that must raise `ProjectError`. Every valid case is checked for
+its expected duration and zero-slack set, for dependency/timing invariants,
+and against an independently written longest-path baseline. The report is
+generated at `evals/EVAL_REPORT.md` (ignored, not committed).
+
+`tests/test_cpm_validation.py` adds 25 seeded random DAGs against the same
+baseline, cycles, disconnected components, zero durations, multiple critical
+paths, malformed input, and schedules with 2000 tasks. Design, invariants and
+known limits are in `docs/M01.md`.
+
 ## Quick start
 
 ```bash
-pip install -e ".[dev]"
+pip install -e ".[dev,langgraph]"     # langgraph is needed for the coverage gate
 python -m pytest                      # unit tests
 python -m multi_agent_optimizer.main  # run the worked example
 python evals/evaluate.py              # golden-case eval gate
 ```
+
+The coverage gate is 80%. Installing only `.[dev]` leaves `lg_graph.py` and
+part of `agents.py` unimported by the suite, so coverage falls below the gate
+— the `langgraph` extra is not optional for a green local run.
 
 ### Using the API
 
@@ -69,6 +89,8 @@ project = {
 
 result = MultiAgentOptimizer().optimize(project)
 print(result.schedule.project_duration)   # 11
+# critical_path is the sorted set of zero-slack task ids, not an ordered walk;
+# with several critical paths, every task on any of them appears.
 print(result.schedule.critical_path)      # ['A', 'C', 'E', 'F']
 print(result.schedule.tasks["A"].slack)   # 0
 print([r.task for r in result.risks if r.level == "HIGH"])   # ['A','C','E','F']
@@ -96,9 +118,11 @@ src/multi_agent_optimizer/
   agents.py         # Scheduler, Risk, Optimiser + pluggable LLM client
   orchestrator.py   # MultiAgentOptimizer facade
 evals/
-  golden_cases/     # ground-truth schedules + expected critical paths
+  golden_cases/     # valid and invalid ground-truth cases
   evaluate.py       # eval gate (blocks CI on mismatch)
-tests/              # unit tests (pytest)
+docs/
+  M01.md            # validation design, invariants and limits
+tests/              # unit tests (pytest), incl. test_cpm_validation.py
 ```
 
 ## LangGraph integration (optional)

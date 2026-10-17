@@ -1,0 +1,7 @@
+{
+  "name": "case_009_negative_duration",
+  "project": {
+    "A": { "duration": -3 }
+  },
+  "expected_error": "non-negative int"
+}

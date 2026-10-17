@@ -1,0 +1,8 @@
+{
+  "name": "case_008_unknown_dependency",
+  "project": {
+    "A": { "duration": 1 },
+    "B": { "duration": 1, "dependencies": ["Z"] }
+  },
+  "expected_error": "unknown task"
+}
