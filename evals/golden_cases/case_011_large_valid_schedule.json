@@ -1,0 +1,407 @@
+{
+  "name": "case_011_large_valid_schedule",
+  "project": {
+    "C0": {
+      "duration": 2
+    },
+    "C1": {
+      "duration": 2,
+      "dependencies": [
+        "C0"
+      ]
+    },
+    "C2": {
+      "duration": 2,
+      "dependencies": [
+        "C1"
+      ]
+    },
+    "C3": {
+      "duration": 2,
+      "dependencies": [
+        "C2"
+      ]
+    },
+    "C4": {
+      "duration": 2,
+      "dependencies": [
+        "C3"
+      ]
+    },
+    "C5": {
+      "duration": 2,
+      "dependencies": [
+        "C4"
+      ]
+    },
+    "C6": {
+      "duration": 2,
+      "dependencies": [
+        "C5"
+      ]
+    },
+    "C7": {
+      "duration": 2,
+      "dependencies": [
+        "C6"
+      ]
+    },
+    "C8": {
+      "duration": 2,
+      "dependencies": [
+        "C7"
+      ]
+    },
+    "C9": {
+      "duration": 2,
+      "dependencies": [
+        "C8"
+      ]
+    },
+    "C10": {
+      "duration": 2,
+      "dependencies": [
+        "C9"
+      ]
+    },
+    "C11": {
+      "duration": 2,
+      "dependencies": [
+        "C10"
+      ]
+    },
+    "C12": {
+      "duration": 2,
+      "dependencies": [
+        "C11"
+      ]
+    },
+    "C13": {
+      "duration": 2,
+      "dependencies": [
+        "C12"
+      ]
+    },
+    "C14": {
+      "duration": 2,
+      "dependencies": [
+        "C13"
+      ]
+    },
+    "C15": {
+      "duration": 2,
+      "dependencies": [
+        "C14"
+      ]
+    },
+    "C16": {
+      "duration": 2,
+      "dependencies": [
+        "C15"
+      ]
+    },
+    "C17": {
+      "duration": 2,
+      "dependencies": [
+        "C16"
+      ]
+    },
+    "C18": {
+      "duration": 2,
+      "dependencies": [
+        "C17"
+      ]
+    },
+    "C19": {
+      "duration": 2,
+      "dependencies": [
+        "C18"
+      ]
+    },
+    "C20": {
+      "duration": 2,
+      "dependencies": [
+        "C19"
+      ]
+    },
+    "C21": {
+      "duration": 2,
+      "dependencies": [
+        "C20"
+      ]
+    },
+    "C22": {
+      "duration": 2,
+      "dependencies": [
+        "C21"
+      ]
+    },
+    "C23": {
+      "duration": 2,
+      "dependencies": [
+        "C22"
+      ]
+    },
+    "C24": {
+      "duration": 2,
+      "dependencies": [
+        "C23"
+      ]
+    },
+    "C25": {
+      "duration": 2,
+      "dependencies": [
+        "C24"
+      ]
+    },
+    "C26": {
+      "duration": 2,
+      "dependencies": [
+        "C25"
+      ]
+    },
+    "C27": {
+      "duration": 2,
+      "dependencies": [
+        "C26"
+      ]
+    },
+    "C28": {
+      "duration": 2,
+      "dependencies": [
+        "C27"
+      ]
+    },
+    "C29": {
+      "duration": 2,
+      "dependencies": [
+        "C28"
+      ]
+    },
+    "C30": {
+      "duration": 2,
+      "dependencies": [
+        "C29"
+      ]
+    },
+    "C31": {
+      "duration": 2,
+      "dependencies": [
+        "C30"
+      ]
+    },
+    "C32": {
+      "duration": 2,
+      "dependencies": [
+        "C31"
+      ]
+    },
+    "C33": {
+      "duration": 2,
+      "dependencies": [
+        "C32"
+      ]
+    },
+    "C34": {
+      "duration": 2,
+      "dependencies": [
+        "C33"
+      ]
+    },
+    "C35": {
+      "duration": 2,
+      "dependencies": [
+        "C34"
+      ]
+    },
+    "C36": {
+      "duration": 2,
+      "dependencies": [
+        "C35"
+      ]
+    },
+    "C37": {
+      "duration": 2,
+      "dependencies": [
+        "C36"
+      ]
+    },
+    "C38": {
+      "duration": 2,
+      "dependencies": [
+        "C37"
+      ]
+    },
+    "C39": {
+      "duration": 2,
+      "dependencies": [
+        "C38"
+      ]
+    },
+    "S0": {
+      "duration": 1,
+      "dependencies": [
+        "C0"
+      ]
+    },
+    "S1": {
+      "duration": 1,
+      "dependencies": [
+        "C4"
+      ]
+    },
+    "S2": {
+      "duration": 1,
+      "dependencies": [
+        "C8"
+      ]
+    },
+    "S3": {
+      "duration": 1,
+      "dependencies": [
+        "C12"
+      ]
+    },
+    "S4": {
+      "duration": 1,
+      "dependencies": [
+        "C16"
+      ]
+    },
+    "S5": {
+      "duration": 1,
+      "dependencies": [
+        "C20"
+      ]
+    },
+    "S6": {
+      "duration": 1,
+      "dependencies": [
+        "C24"
+      ]
+    },
+    "S7": {
+      "duration": 1,
+      "dependencies": [
+        "C28"
+      ]
+    },
+    "S8": {
+      "duration": 1,
+      "dependencies": [
+        "C32"
+      ]
+    },
+    "S9": {
+      "duration": 1,
+      "dependencies": [
+        "C36"
+      ]
+    },
+    "SF0": {
+      "duration": 1,
+      "dependencies": [
+        "S0"
+      ]
+    },
+    "SF1": {
+      "duration": 1,
+      "dependencies": [
+        "S1"
+      ]
+    },
+    "SF2": {
+      "duration": 1,
+      "dependencies": [
+        "S2"
+      ]
+    },
+    "SF3": {
+      "duration": 1,
+      "dependencies": [
+        "S3"
+      ]
+    },
+    "SF4": {
+      "duration": 1,
+      "dependencies": [
+        "S4"
+      ]
+    },
+    "SF5": {
+      "duration": 1,
+      "dependencies": [
+        "S5"
+      ]
+    },
+    "SF6": {
+      "duration": 1,
+      "dependencies": [
+        "S6"
+      ]
+    },
+    "SF7": {
+      "duration": 1,
+      "dependencies": [
+        "S7"
+      ]
+    },
+    "SF8": {
+      "duration": 1,
+      "dependencies": [
+        "S8"
+      ]
+    },
+    "SF9": {
+      "duration": 1,
+      "dependencies": [
+        "S9"
+      ]
+    }
+  },
+  "expected": {
+    "project_duration": 80,
+    "critical_path": [
+      "C0",
+      "C1",
+      "C10",
+      "C11",
+      "C12",
+      "C13",
+      "C14",
+      "C15",
+      "C16",
+      "C17",
+      "C18",
+      "C19",
+      "C2",
+      "C20",
+      "C21",
+      "C22",
+      "C23",
+      "C24",
+      "C25",
+      "C26",
+      "C27",
+      "C28",
+      "C29",
+      "C3",
+      "C30",
+      "C31",
+      "C32",
+      "C33",
+      "C34",
+      "C35",
+      "C36",
+      "C37",
+      "C38",
+      "C39",
+      "C4",
+      "C5",
+      "C6",
+      "C7",
+      "C8",
+      "C9"
+    ]
+  }
+}

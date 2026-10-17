@@ -1,0 +1,8 @@
+{
+  "name": "case_010_duplicate_dependency",
+  "project": {
+    "A": { "duration": 1 },
+    "B": { "duration": 1, "dependencies": ["A", "A"] }
+  },
+  "expected_error": "duplicate"
+}

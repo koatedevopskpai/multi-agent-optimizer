@@ -1,0 +1,13 @@
+{
+  "name": "case_005_multiple_critical_paths",
+  "project": {
+    "S": { "duration": 1 },
+    "P": { "duration": 3, "dependencies": ["S"] },
+    "Q": { "duration": 3, "dependencies": ["S"] },
+    "E": { "duration": 1, "dependencies": ["P", "Q"] }
+  },
+  "expected": {
+    "project_duration": 5,
+    "critical_path": ["E", "P", "Q", "S"]
+  }
+}
