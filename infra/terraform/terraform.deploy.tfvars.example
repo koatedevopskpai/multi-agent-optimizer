@@ -1,0 +1,4 @@
+# Copy to terraform.deploy.tfvars (gitignored).
+# Used for the deploy-role ECR, full apply, and non-IAM teardown stages.
+aws_profile               = "focused-deploy"
+expected_stage_role_name  = "focused-delivery-recovery-deploy"

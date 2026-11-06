@@ -1,0 +1,5 @@
+# Copy to terraform.deploy-oidc.tfvars (gitignored) only in a runner that
+# already supplies short-lived deploy-role credentials. The bootstrap role is
+# MFA-human-only and is not available through this chain.
+aws_profile               = ""
+expected_stage_role_name  = "focused-delivery-recovery-deploy"

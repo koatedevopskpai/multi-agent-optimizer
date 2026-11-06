@@ -1,0 +1,20 @@
+{
+  "schema_version": "phase2-eval-v1",
+  "partition": "holdout",
+  "frozen": true,
+  "synthetic": true,
+  "provider": "fake",
+  "note": "Frozen holdout metadata. Do not use these cases for prompt tuning or development iteration.",
+  "cases": [
+    {
+      "id": "holdout-auth-failure",
+      "kind": "auth_failure",
+      "expected_status": "degraded"
+    },
+    {
+      "id": "holdout-semantic-invalid",
+      "kind": "semantic_failure",
+      "expected_status": "degraded"
+    }
+  ]
+}

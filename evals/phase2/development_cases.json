@@ -1,0 +1,28 @@
+{
+  "schema_version": "phase2-eval-v1",
+  "partition": "development",
+  "synthetic": true,
+  "provider": "fake",
+  "cases": [
+    {
+      "id": "dev-happy-tool-then-explain",
+      "kind": "happy_path",
+      "expected_status": "completed"
+    },
+    {
+      "id": "dev-missing-budget",
+      "kind": "clarification",
+      "expected_status": "needs_input"
+    },
+    {
+      "id": "dev-forbidden-tool",
+      "kind": "forbidden_tool",
+      "expected_status": "degraded"
+    },
+    {
+      "id": "dev-schema-repair-exhausted",
+      "kind": "schema_failure",
+      "expected_status": "degraded"
+    }
+  ]
+}

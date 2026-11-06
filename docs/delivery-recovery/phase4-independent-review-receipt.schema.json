@@ -1,0 +1,38 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "Phase 4 independent IAM review receipt",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema",
+    "reviewer",
+    "reviewed_at_utc",
+    "decision",
+    "scope",
+    "manifest_schema",
+    "manifest_sha256",
+    "active_document_count",
+    "terraform_source_sha256"
+  ],
+  "properties": {
+    "schema": { "const": "phase4-independent-review-receipt-v1" },
+    "reviewer": { "type": "string", "minLength": 1 },
+    "reviewed_at_utc": { "type": "string", "minLength": 1 },
+    "decision": { "const": "accepted" },
+    "scope": { "const": "phase4-iam-active-named-profile" },
+    "manifest_schema": { "const": "phase4-active-iam-manifest-v2" },
+    "manifest_sha256": { "type": "string", "pattern": "^[0-9a-f]{64}$" },
+    "active_document_count": { "const": 9 },
+    "terraform_source_sha256": { "type": "string", "pattern": "^[0-9a-f]{64}$" },
+    "runtime_iam_plan": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["reviewed_at_utc", "plan_sha256", "plan_json_sha256"],
+      "properties": {
+        "reviewed_at_utc": { "type": "string", "minLength": 1 },
+        "plan_sha256": { "type": "string", "pattern": "^[0-9a-f]{64}$" },
+        "plan_json_sha256": { "type": "string", "pattern": "^[0-9a-f]{64}$" }
+      }
+    }
+  }
+}

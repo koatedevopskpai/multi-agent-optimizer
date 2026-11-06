@@ -1,0 +1,4 @@
+# Copy to terraform.bootstrap.tfvars (gitignored).
+# Used only for the bootstrap-role IAM stages.
+aws_profile               = "focused-bootstrap"
+expected_stage_role_name  = "focused-delivery-recovery-bootstrap"

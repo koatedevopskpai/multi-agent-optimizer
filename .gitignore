@@ -1,11 +1,19 @@
 # Env
 .env
+.env.*
+!.env.example
+.secrets/
+private/
+*.bundle
+*.tfplan
+*.private.json
 
 # Python
 __pycache__/
 *.py[cod]
 *.egg-info/
 .venv/
+.venv-*/
 venv/
 .pytest_cache/
 .ruff_cache/
@@ -16,10 +24,32 @@ venv/
 .idea/
 .DS_Store
 Thumbs.db
+# web
+web/node_modules/
+web/dist/
+evidence/delivery-recovery/runs/*/logs/uvicorn.*.log
+
 # coverage
 .coverage
 .coverage.*
 htmlcov/
+coverage.json
+
+# local Phase 3 data and credentials
+var/
+*.db-wal
+*.db-shm
 
 # generated eval report
 evals/EVAL_REPORT.md
+
+# Phase 4 infrastructure state and build artefacts
+build/
+dist/
+infra/terraform/.terraform/
+infra/terraform/*.tfstate
+infra/terraform/*.tfstate.*
+infra/terraform/*.tfvars
+infra/terraform/crash.log
+infra/terraform/.terraform.tfstate.lock.info
+infra/terraform/.bootstrap.zip

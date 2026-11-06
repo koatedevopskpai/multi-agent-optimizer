@@ -1,0 +1,25 @@
+# Copy to terraform.tfvars after the deployment packet is reviewed.
+# This file contains common private values only. Never put credentials, real
+# secrets or account IDs in public artifacts.
+#
+# The stage profile and expected role are supplied by a separate gitignored
+# stage file, for example:
+#   terraform.bootstrap.tfvars  -> aws_profile = "focused-bootstrap"
+#   terraform.deploy.tfvars     -> aws_profile = "focused-deploy"
+#   terraform.deploy-oidc.tfvars -> aws_profile = "" (runner-provided chain)
+# Do not set aws_profile in this common file: a stale explicit value would
+# override the stage's intended profile. The stage preflight verifies the
+# actual role and account before any proposed mutation.
+expected_account_id = "REPLACE_12_DIGIT_ACCOUNT_ID"
+aws_region          = "eu-west-2"
+project_tag        = "focused-delivery-recovery"
+owner_tag          = "koate"
+vpc_id             = "vpc-REPLACE_AFTER_READ_ONLY_CHECK"
+subnet_id          = "subnet-REPLACE_AFTER_READ_ONLY_CHECK"
+instance_type      = "t4g.medium"
+root_volume_size_gb = 10
+data_volume_size_gb = 20
+image_uri          = "REPLACE_WITH_ACCOUNT.dkr.ecr.eu-west-2.amazonaws.com/focused-delivery-recovery@sha256:REPLACE_WITH_64_HEX"
+ecr_repository_name = "focused-delivery-recovery"
+log_group_name      = "/aws/delivery-recovery/app"
+log_retention_days  = 7

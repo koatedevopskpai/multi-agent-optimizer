@@ -1,0 +1,18 @@
+[Unit]
+Description=Delivery Recovery Assistant
+After=network-online.target docker.service
+Wants=network-online.target
+RequiresMountsFor=/srv/delivery-recovery/data
+ConditionPathIsMountPoint=/srv/delivery-recovery/data
+
+[Service]
+Type=oneshot
+RemainAfterExit=yes
+ExecStartPre=/usr/local/lib/delivery-recovery/data-volume.sh verify --mountpoint /srv/delivery-recovery/data
+ExecStart=/usr/local/lib/delivery-recovery/service-control.sh start
+ExecStop=/usr/local/lib/delivery-recovery/service-control.sh stop
+TimeoutStartSec=300
+Restart=no
+
+[Install]
+WantedBy=multi-user.target

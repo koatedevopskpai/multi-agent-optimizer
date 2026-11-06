@@ -17,8 +17,39 @@ jobs:
           python -m pip install --upgrade pip
           pip install -e ".[dev,langgraph]"
 
+      - uses: hashicorp/setup-terraform@v3
+        with:
+          terraform_version: 1.15.4
+          terraform_wrapper: false
+
       - name: Unit tests
         run: python -m pytest
 
+      - name: Branch-only coverage gate
+        run: |
+          python -m coverage json -o coverage.json
+          python scripts/check_coverage.py coverage.json \
+            --require src/delivery_recovery/candidates.py=90 \
+            --require src/delivery_recovery/contracts.py=90 \
+            --require src/delivery_recovery/workflow/providers.py=90 \
+            --require src/delivery_recovery/workflow/graph.py=90 \
+            --require src/delivery_recovery/workflow/http_provider.py=90 \
+            --require src/delivery_recovery/workflow/exporters.py=90
+
       - name: Evaluation gate
         run: python evals/evaluate.py
+
+      - name: Set up Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: "24"
+          cache: npm
+          cache-dependency-path: web/package-lock.json
+
+      - name: Frontend install, interaction tests and build
+        working-directory: web
+        run: |
+          npm ci
+          npm test
+          npm run build
+          npm audit --audit-level=high

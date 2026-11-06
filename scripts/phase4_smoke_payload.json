@@ -1,0 +1,98 @@
+{
+  "budget_pence": 200000,
+  "catalogue": [
+    {
+      "assumptions": [],
+      "changes": [
+        {
+          "new_duration_workdays": 5,
+          "task_id": "C"
+        }
+      ],
+      "incompatible_option_ids": [],
+      "incremental_cost_pence": 180000,
+      "option_id": "EXPEDITE_PANEL"
+    },
+    {
+      "assumptions": [],
+      "changes": [
+        {
+          "new_duration_workdays": 3,
+          "task_id": "D"
+        }
+      ],
+      "incompatible_option_ids": [],
+      "incremental_cost_pence": 120000,
+      "option_id": "INSTALL_SUPPORT"
+    }
+  ],
+  "currency": "GBP",
+  "disruption": {
+    "revised_duration_workdays": 7,
+    "task_id": "C"
+  },
+  "project_id": "UTILITY-DEMO-001",
+  "schema_version": "delivery-recovery-v1",
+  "start_offset_workdays": 0,
+  "target_finish_offset_workdays": 15,
+  "tasks": [
+    {
+      "dependency_ids": [],
+      "duration_workdays": 2,
+      "id": "A",
+      "name": "Access and work-pack preparation"
+    },
+    {
+      "dependency_ids": [
+        "A"
+      ],
+      "duration_workdays": 3,
+      "id": "B",
+      "name": "Site survey"
+    },
+    {
+      "dependency_ids": [
+        "A"
+      ],
+      "duration_workdays": 5,
+      "id": "C",
+      "name": "Control-panel supply"
+    },
+    {
+      "dependency_ids": [
+        "B",
+        "C"
+      ],
+      "duration_workdays": 4,
+      "id": "D",
+      "name": "Installation"
+    },
+    {
+      "dependency_ids": [
+        "D"
+      ],
+      "duration_workdays": 3,
+      "id": "E",
+      "name": "Commissioning checks"
+    },
+    {
+      "dependency_ids": [
+        "B"
+      ],
+      "duration_workdays": 2,
+      "id": "F",
+      "name": "Operator training preparation"
+    },
+    {
+      "dependency_ids": [
+        "E",
+        "F"
+      ],
+      "duration_workdays": 1,
+      "id": "G",
+      "name": "Handover"
+    }
+  ],
+  "time_unit": "working_day",
+  "version": 1
+}

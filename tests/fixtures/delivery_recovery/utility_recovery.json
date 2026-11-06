@@ -1,0 +1,155 @@
+{
+  "schema_version": "planning-fixture-v1",
+  "synthetic": true,
+  "project_id": "UTILITY-DEMO-001",
+  "project_version": 1,
+  "time_unit": "working_day",
+  "start_offset_workdays": 0,
+  "currency": "GBP",
+  "target_finish_offset_workdays": 15,
+  "budget_pence": 200000,
+  "assumptions": [
+    "Integer working-day offsets, not calendar dates",
+    "Finish-to-start, zero-lag dependencies",
+    "Independent capacity for parallel tasks",
+    "Catalogue duration/cost inputs are synthetic assumptions, not verified quotations"
+  ],
+  "baseline_tasks": {
+    "A": {
+      "name": "Access and work-pack preparation",
+      "duration": 2,
+      "dependencies": []
+    },
+    "B": {
+      "name": "Site survey",
+      "duration": 3,
+      "dependencies": [
+        "A"
+      ]
+    },
+    "C": {
+      "name": "Control-panel supply",
+      "duration": 5,
+      "dependencies": [
+        "A"
+      ]
+    },
+    "D": {
+      "name": "Installation",
+      "duration": 4,
+      "dependencies": [
+        "B",
+        "C"
+      ]
+    },
+    "E": {
+      "name": "Commissioning checks",
+      "duration": 3,
+      "dependencies": [
+        "D"
+      ]
+    },
+    "F": {
+      "name": "Operator training preparation",
+      "duration": 2,
+      "dependencies": [
+        "B"
+      ]
+    },
+    "G": {
+      "name": "Handover",
+      "duration": 1,
+      "dependencies": [
+        "E",
+        "F"
+      ]
+    }
+  },
+  "disruption": {
+    "task_id": "C",
+    "revised_duration_workdays": 7
+  },
+  "recovery_catalogue": [
+    {
+      "option_id": "EXPEDITE_PANEL",
+      "changes": [
+        {
+          "task_id": "C",
+          "new_duration_workdays": 5
+        }
+      ],
+      "incremental_cost_pence": 180000
+    },
+    {
+      "option_id": "INSTALL_SUPPORT",
+      "changes": [
+        {
+          "task_id": "D",
+          "new_duration_workdays": 3
+        }
+      ],
+      "incremental_cost_pence": 120000
+    }
+  ],
+  "expected": {
+    "baseline_finish": 15,
+    "disrupted_finish": 17,
+    "critical_task_ids": [
+      "A",
+      "C",
+      "D",
+      "E",
+      "G"
+    ],
+    "candidates": [
+      {
+        "option_ids": [],
+        "finish": 17,
+        "cost_pence": 0,
+        "project_saving_workdays": 0,
+        "feasible": false,
+        "rejection_codes": [
+          "TARGET_MISSED"
+        ]
+      },
+      {
+        "option_ids": [
+          "EXPEDITE_PANEL"
+        ],
+        "finish": 15,
+        "cost_pence": 180000,
+        "project_saving_workdays": 2,
+        "feasible": true,
+        "rejection_codes": []
+      },
+      {
+        "option_ids": [
+          "INSTALL_SUPPORT"
+        ],
+        "finish": 16,
+        "cost_pence": 120000,
+        "project_saving_workdays": 1,
+        "feasible": false,
+        "rejection_codes": [
+          "TARGET_MISSED"
+        ]
+      },
+      {
+        "option_ids": [
+          "EXPEDITE_PANEL",
+          "INSTALL_SUPPORT"
+        ],
+        "finish": 14,
+        "cost_pence": 300000,
+        "project_saving_workdays": 3,
+        "feasible": false,
+        "rejection_codes": [
+          "BUDGET_EXCEEDED"
+        ]
+      }
+    ],
+    "recommended_option_ids": [
+      "EXPEDITE_PANEL"
+    ]
+  }
+}

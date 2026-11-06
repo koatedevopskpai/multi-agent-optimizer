@@ -9,10 +9,21 @@ PROJECT = {
     "F": {"duration": 3, "dependencies": ["D", "E"]},
 }
 
+# A -> B(5) is deliberately not the critical branch: A -> C -> D -> E is 9
+# days, so B has slack and is medium risk for its length, not high risk.
+MEDIUM_PROJECT = {
+    "A": {"duration": 1},
+    "B": {"duration": 5, "dependencies": ["A"]},
+    "C": {"duration": 3, "dependencies": ["A"]},
+    "D": {"duration": 4, "dependencies": ["C"]},
+    "E": {"duration": 1, "dependencies": ["B", "D"]},
+}
+
 
 def test_end_to_end_deterministic():
     result = MultiAgentOptimizer().optimize(PROJECT)
-    assert result.schedule.project_duration == 11 or result.schedule.project_duration > 0
+    assert result.schedule.project_duration == 17
+    assert result.schedule.critical_path == ["A", "B", "D", "F"]
     assert result.narrative  # schedule table is always present in no-op mode
 
 
@@ -20,8 +31,7 @@ def test_risks_flag_critical_tasks_high():
     result = MultiAgentOptimizer().optimize(PROJECT)
     critical_ids = set(result.schedule.critical_path)
     high = {r.task for r in result.risks if r.level == "HIGH"}
-    assert high.issubset(critical_ids)
-    assert high  # there is at least one critical task
+    assert high == critical_ids == {"A", "B", "D", "F"}
 
 
 def test_suggestions_target_critical_tasks():
@@ -33,8 +43,9 @@ def test_suggestions_target_critical_tasks():
             assert s.expected_saving_days > 0
 
 
-def test_long_task_is_medium_risk():
-    result = MultiAgentOptimizer().optimize(PROJECT)
-    levels = {r.task: r.level for r in result.risks if r.level == "MED"}
-    # D is 9 days; any non-critical long task should be flagged MED.
-    assert "D" in levels or "D" in {r.task for r in result.risks}
+def test_long_noncritical_task_is_medium_risk():
+    result = MultiAgentOptimizer().optimize(MEDIUM_PROJECT)
+    levels = {r.task: r.level for r in result.risks}
+    assert result.schedule.tasks["B"].slack > 0
+    assert levels["B"] == "MED"
+    assert levels["A"] == levels["C"] == levels["D"] == levels["E"] == "HIGH"

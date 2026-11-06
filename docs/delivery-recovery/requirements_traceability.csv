@@ -1,0 +1,39 @@
+requirement_id,description,scenario_ids,proposed_test,planned_evidence,priority,status,owner
+FR-01,Typed intake and actionable validation,SC-02;SC-05,test_intake_validation,contract report; clarification trace,Must,planned,Koate
+FR-02,Baseline and disruption facts,SC-01;SC-13,test_baseline_disruption_adapter,fixture report; UI,Must,planned,Koate
+FR-03,Permitted recovery comparison,SC-01;SC-03;SC-04,test_candidate_recomputation,candidate report,Must,planned,Koate
+FR-04,Bounded tool-assisted questions,SC-06;SC-12;SC-14,test_allowlisted_tool_loop,tool trace; execution counts,Must,planned,Koate
+FR-05,Supported explanations and visible fallback,SC-06;SC-07,test_narrative_fact_references,validation trace; UI,Must,planned,Koate
+FR-06,Authorised version-bound approval,SC-11;SC-12,test_approval_authorisation_idempotency;test_second_run_for_same_version_cannot_approve;test_same_version_catalogue_change_is_rejected_before_persistence,DR-P3C-20261103T044000Z audit and revision records,Must,implemented_local,Koate
+FR-07,Persistent resume,SC-10;SC-11,test_restart_resume;test_process_restart_recovers_pending_state,DR-P3R-20261102T194000Z restart summary and app restart observation,Must,implemented_local,Koate
+FR-08,Failure diagnosis,SC-07;SC-08;SC-09;SC-15,test_trace_correlation,trace export; logs,Must,planned,Koate
+FR-09,Decision audit,SC-10;SC-11,test_atomic_decision_audit;test_rejection_does_not_advance_project_version,DR-P3R-20261102T194000Z decision history and UI history binding tests,Must,implemented_local,Koate
+FR-10,Reproducible runs,SC-01;SC-16,test_manifest_completeness,manifest; lockfile; digest,Must,planned,Koate
+BR-01,Deterministic fact authority,SC-01;SC-06,test_facts_immutable,facts/hash comparison,Must,planned,Koate
+BR-02,Explicit units and required inputs,SC-02;SC-13,test_missing_fact_clarification,API/graph tests,Must,planned,Koate
+BR-03,Catalogue-authorised changes only,SC-05;SC-12,test_forbidden_changes,negative policy report,Must,planned,Koate
+BR-04,Recomputed project savings,SC-03,test_parallel_critical_paths,red/green logs,Must,planned,Koate
+BR-05,No silent relaxation of constraints,SC-04,test_no_feasible_candidate,comparison table,Must,planned,Koate
+BR-06,Stable ranking of feasible catalogue candidates,SC-01;SC-04,test_stable_ranking,domain test report,Must,planned,Koate
+BR-07,Version/input/catalogue CAS and hash-bound manager approval across separate runs,SC-11,test_second_run_for_same_version_cannot_approve;test_concurrent_runs_for_same_version_produce_one_winner;test_concurrent_conflicting_catalogue_decisions_have_one_winner,DR-P3C-20261103T044000Z transaction report,Must,implemented_local,Koate
+BR-08,Idempotent revision and event,SC-11,test_approval_creates_one_revision_and_idempotent_replay;test_rejection_does_not_advance_project_version;test_committed_catalogue_decision_replay_has_no_new_effects,DR-P3C-20261103T044000Z crash-window audit,Must,implemented_local,Koate
+BR-09,Labelled valid fallback,SC-07,test_degraded_mode,UI/trace,Must,planned,Koate
+BR-10,Semantic validation beyond schema,SC-06,test_invalid_fact_rejected,validation spans,Must,planned,Koate
+BR-11,No external project/procurement mutation,SC-05;SC-12,test_tools_are_read_only,tool registry inspection,Must,planned,Koate
+BR-12,Untrusted content cannot grant authority,SC-12,test_injection_does_not_change_policy,adversarial report,Must,planned,Koate
+NFR-01,Scheduling correctness,SC-01;SC-03;SC-13,test_core_and_candidate_invariants,core eval; candidate eval,Must,planned,Koate
+NFR-02,Deterministic API p95 <=250ms profile P1,SC-14,load_profile_p1,raw samples and latency report,Must,planned,Koate
+NFR-03,Bounded calls steps and elapsed turn,SC-07;SC-14,test_global_execution_budget,deadline/call trace,Must,planned,Koate
+NFR-04,One active job plus four queued,SC-14,test_queue_limit,queue/load report,Must,implemented_local,Koate
+NFR-05,Restart preserves committed decisions,SC-10;SC-11,test_crash_windows;test_process_restart_recovers_pending_state,DR-P3R-20261102T194000Z restart timeline,Must,observed_local,Koate
+NFR-06,Authorisation negative cases denied,SC-11;SC-12,test_role_and_run_access;test_wrong_project_creation_is_denied_without_side_effects;test_idempotency_is_scoped_to_principal,DR-P3R-20261102T194000Z security test report,Must,implemented_local,Koate
+NFR-07,Trace/log correlation or explicit trace failure,SC-07;SC-15,test_observability_failure,manifest/log/trace cross-check,Must,planned,Koate
+NFR-08,Bounded strict inputs,SC-02;SC-14,test_input_limits,boundary report,Must,planned,Koate
+NFR-09,Token reservation and call budgets,SC-14,test_token_admission,usage/budget report,Must,planned,Koate
+NFR-10,Locked reproducible build,SC-16,test_release_metadata,lock; CI; digest,Must,planned,Koate
+NFR-11,No secrets in exported evidence,SC-12,test_canary_secret_redaction,scan/export review,Must,planned,Koate
+NFR-12,Keyboard-accessible user journeys,SC-01;SC-02,ui_keyboard_acceptance,UI checklist,Must,implemented_local,Koate
+NFR-13,Consistent backup and measured restore,SC-10,test_restore_state,restore report,Must,planned,Koate
+NFR-14,Coverage and high-risk mutation checks,SC-03;SC-11,test_coverage_gates;mutation_policy_checks,DR-P3R-20261102T194000Z coverage gate; mutation report pending,Must,implemented_local,Koate
+NFR-15,Verified deployment and rollback,SC-16,business_smoke,release/rollback record,Must,planned,Koate
+NFR-16,Bounded runtime security posture,SC-12;SC-16,test_runtime_configuration,IaC/image/runtime evidence,Must,planned,Koate

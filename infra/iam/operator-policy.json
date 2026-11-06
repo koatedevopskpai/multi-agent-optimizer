@@ -1,0 +1,120 @@
+{
+  "Version": "2012-10-17",
+  "Statement": [
+    {
+      "Sid": "DescribeProjectRuntime",
+      "Effect": "Allow",
+      "Action": [
+        "ec2:DescribeAddresses",
+        "ec2:DescribeInstances",
+        "ec2:DescribeInstanceStatus",
+        "ec2:DescribeSecurityGroups",
+        "ec2:DescribeSnapshots",
+        "ec2:DescribeVolumes"
+      ],
+      "Resource": "*"
+    },
+    {
+      "Sid": "StartStopProjectInstance",
+      "Effect": "Allow",
+      "Action": [
+        "ec2:StartInstances",
+        "ec2:StopInstances"
+      ],
+      "Resource": "arn:aws:ec2:eu-west-2:<account-id>:instance/*",
+      "Condition": {
+        "StringEquals": {
+          "ec2:ResourceTag/Project": "focused-delivery-recovery"
+        }
+      }
+    },
+    {
+      "Sid": "SsmStartSessionOnProjectInstance",
+      "Effect": "Allow",
+      "Action": "ssm:StartSession",
+      "Resource": "arn:aws:ec2:eu-west-2:<account-id>:instance/*",
+      "Condition": {
+        "StringEquals": {
+          "ssm:ResourceTag/Project": "focused-delivery-recovery"
+        }
+      }
+    },
+    {
+      "Sid": "SsmStartSessionDocument",
+      "Effect": "Allow",
+      "Action": "ssm:StartSession",
+      "Resource": "arn:aws:ssm:eu-west-2::document/AWS-StartPortForwardingSession"
+    },
+    {
+      "Sid": "SsmSessionLifecycle",
+      "Effect": "Allow",
+      "Action": [
+        "ssm:TerminateSession",
+        "ssm:ResumeSession"
+      ],
+      "Resource": "arn:aws:ssm:eu-west-2:<account-id>:session/*"
+    },
+    {
+      "Sid": "SsmDescribeSessions",
+      "Effect": "Allow",
+      "Action": "ssm:DescribeSessions",
+      "Resource": "*"
+    },
+    {
+      "Sid": "SsmSendCommandOnProjectInstance",
+      "Effect": "Allow",
+      "Action": "ssm:SendCommand",
+      "Resource": "arn:aws:ec2:eu-west-2:<account-id>:instance/*",
+      "Condition": {
+        "StringEquals": {
+          "ssm:ResourceTag/Project": "focused-delivery-recovery"
+        }
+      }
+    },
+    {
+      "Sid": "SsmSendCommandDocument",
+      "Effect": "Allow",
+      "Action": "ssm:SendCommand",
+      "Resource": "arn:aws:ssm:eu-west-2::document/AWS-RunShellScript"
+    },
+    {
+      "Sid": "SsmCommandLifecycle",
+      "Effect": "Allow",
+      "Action": [
+        "ssm:GetCommandInvocation",
+        "ssm:CancelCommand"
+      ],
+      "Resource": "*"
+    },
+    {
+      "Sid": "SsmListAndInventory",
+      "Effect": "Allow",
+      "Action": [
+        "ssm:ListCommands",
+        "ssm:DescribeInstanceInformation"
+      ],
+      "Resource": "*"
+    },
+    {
+      "Sid": "ProjectLogRead",
+      "Effect": "Allow",
+      "Action": [
+        "logs:DescribeLogStreams",
+        "logs:FilterLogEvents",
+        "logs:GetLogEvents"
+      ],
+      "Resource": "arn:aws:logs:eu-west-2:<account-id>:log-group:/aws/delivery-recovery/app:*"
+    },
+    {
+      "Sid": "SsmConnectionStatusOnProjectInstance",
+      "Effect": "Allow",
+      "Action": "ssm:GetConnectionStatus",
+      "Resource": "arn:aws:ec2:eu-west-2:<account-id>:instance/*",
+      "Condition": {
+        "StringEquals": {
+          "ssm:ResourceTag/Project": "focused-delivery-recovery"
+        }
+      }
+    }
+  ]
+}

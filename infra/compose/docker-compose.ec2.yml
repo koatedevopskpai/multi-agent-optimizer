@@ -1,0 +1,17 @@
+# EC2 overlay: loopback-only published port, persistent encrypted EBS mount and
+# CloudWatch Logs. Deploy with:
+#   DELIVERY_RECOVERY_IMAGE=<ecr-uri>@sha256:<digest> \
+#   DELIVERY_RECOVERY_DATA_HOST=/srv/delivery-recovery/data \
+#   DELIVERY_RECOVERY_LOG_GROUP=/aws/delivery-recovery/app \
+#   docker compose -f compose.yaml -f infra/compose/docker-compose.ec2.yml up -d
+name: delivery-recovery
+
+services:
+  app:
+    logging:
+      driver: awslogs
+      options:
+        awslogs-region: ${AWS_REGION:-eu-west-2}
+        awslogs-group: ${DELIVERY_RECOVERY_LOG_GROUP:-/aws/delivery-recovery/app}
+        awslogs-stream: app
+        awslogs-create-group: "false"

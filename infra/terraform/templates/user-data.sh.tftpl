@@ -1,0 +1,87 @@
+#!/bin/bash
+set -euxo pipefail
+
+# The application is reachable only through SSM port forwarding. This script
+# never opens an inbound application port in the security group.
+dnf install -y docker
+systemctl enable --now docker
+
+if ! command -v aws >/dev/null 2>&1; then
+  dnf install -y awscli-2 || dnf install -y awscli
+fi
+
+install -d -m 0755 /usr/local/lib/delivery-recovery
+install -d -m 0700 /etc/delivery-recovery /opt/delivery-recovery
+install -d -m 0755 /srv/delivery-recovery
+install -d -m 0700 /srv/delivery-recovery/backups
+
+echo '${bootstrap_archive_b64}' | base64 -d > /tmp/delivery-recovery-bootstrap.zip
+python3 -c "import zipfile; zipfile.ZipFile('/tmp/delivery-recovery-bootstrap.zip').extractall('/opt/delivery-recovery/bootstrap')"
+install -m 0755 /opt/delivery-recovery/bootstrap/data-volume.sh /usr/local/lib/delivery-recovery/data-volume.sh
+install -m 0755 /opt/delivery-recovery/bootstrap/service-control.sh /usr/local/lib/delivery-recovery/service-control.sh
+install -m 0755 /opt/delivery-recovery/bootstrap/backup-export.sh /usr/local/lib/delivery-recovery/backup-export.sh
+install -m 0755 /opt/delivery-recovery/bootstrap/restore-switch.sh /usr/local/lib/delivery-recovery/restore-switch.sh
+install -m 0644 /opt/delivery-recovery/bootstrap/delivery-recovery.service /etc/systemd/system/delivery-recovery.service
+rm -f /tmp/delivery-recovery-bootstrap.zip
+
+aws ecr get-login-password --region ${aws_region} \
+  | docker login --username AWS --password-stdin "$(echo ${image_uri} | cut -d/ -f1)"
+docker pull ${image_uri}
+
+if docker compose version >/dev/null 2>&1; then
+  echo compose > /etc/delivery-recovery/mode
+else
+  echo run > /etc/delivery-recovery/mode
+fi
+
+cat > /opt/delivery-recovery/compose.yaml <<'COMPOSE'
+name: delivery-recovery
+services:
+  app:
+    image: $${DELIVERY_RECOVERY_IMAGE}
+    container_name: delivery-recovery
+    restart: "no"
+    init: true
+    ports:
+      - "127.0.0.1:8000:8000"
+    environment:
+      DELIVERY_RECOVERY_DATA_DIR: /data
+      DELIVERY_RECOVERY_MAX_QUEUED_JOBS: "4"
+      DELIVERY_RECOVERY_LEASE_SECONDS: "30"
+      DELIVERY_RECOVERY_PENDING_RETENTION_SECONDS: "86400"
+    volumes:
+      - /srv/delivery-recovery/data/current:/data
+    read_only: true
+    tmpfs:
+      - /tmp:size=64m,mode=1777
+    security_opt:
+      - no-new-privileges:true
+    cap_drop:
+      - ALL
+    logging:
+      driver: awslogs
+      options:
+        awslogs-region: $${AWS_REGION}
+        awslogs-group: $${DELIVERY_RECOVERY_LOG_GROUP}
+        awslogs-stream: app
+        awslogs-create-group: "false"
+COMPOSE
+
+cat > /etc/delivery-recovery/service.env <<ENV
+DELIVERY_RECOVERY_IMAGE=${image_uri}
+DELIVERY_RECOVERY_DATA_HOST=/srv/delivery-recovery/data/current
+DELIVERY_RECOVERY_LOG_GROUP=${log_group_name}
+AWS_REGION=${aws_region}
+ENV
+chmod 0600 /etc/delivery-recovery/service.env
+
+/usr/local/lib/delivery-recovery/data-volume.sh prepare \
+  --expected-volume-id ${volume_id} \
+  --mountpoint /srv/delivery-recovery/data \
+  --wait-seconds 180
+
+install -d -m 0755 -o 10001 -g 10001 /srv/delivery-recovery/data/current
+
+systemctl daemon-reload
+systemctl enable delivery-recovery.service
+systemctl start delivery-recovery.service

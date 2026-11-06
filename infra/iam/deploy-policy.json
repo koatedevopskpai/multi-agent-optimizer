@@ -1,0 +1,272 @@
+{
+  "Version": "2012-10-17",
+  "Statement": [
+    {
+      "Sid": "ReadOnlyDiscovery",
+      "Effect": "Allow",
+      "Action": [
+        "ec2:DescribeAvailabilityZones",
+        "ec2:DescribeImages",
+        "ec2:DescribeInstanceStatus",
+        "ec2:DescribeInstances",
+        "ec2:DescribeInstanceTypes",
+        "ec2:DescribeInternetGateways",
+        "ec2:DescribeNetworkAcls",
+        "ec2:DescribeRouteTables",
+        "ec2:DescribeSecurityGroups",
+        "ec2:DescribeSnapshots",
+        "ec2:DescribeSubnets",
+        "ec2:DescribeTags",
+        "ec2:DescribeVolumes",
+        "ec2:DescribeVpcs",
+        "ecr:DescribeImages",
+        "ecr:DescribeRepositories",
+        "ecr:GetLifecyclePolicy",
+        "ecr:GetRepositoryPolicy",
+        "ecr:ListImages",
+        "ecr:ListTagsForResource",
+        "iam:GetInstanceProfile",
+        "iam:GetRole",
+        "iam:GetRolePolicy",
+        "iam:ListAttachedRolePolicies",
+        "iam:ListInstanceProfileTags",
+        "iam:ListInstanceProfiles",
+        "iam:ListInstanceProfilesForRole",
+        "iam:ListRolePolicies",
+        "iam:ListRoleTags",
+        "logs:DescribeLogGroups",
+        "logs:DescribeLogStreams",
+        "logs:ListTagsForResource",
+        "sts:GetCallerIdentity",
+        "iam:GetPolicy",
+        "iam:GetPolicyVersion",
+        "iam:ListPolicyVersions",
+        "iam:ListPolicyTags"
+      ],
+      "Resource": "*"
+    },
+    {
+      "Sid": "DescribeSelectedVpcAttributes",
+      "Effect": "Allow",
+      "Action": "ec2:DescribeVpcAttribute",
+      "Resource": "arn:aws:ec2:eu-west-2:<account-id>:vpc/<vpc-id>"
+    },
+    {
+      "Sid": "ReadProjectInstanceAttributes",
+      "Effect": "Allow",
+      "Action": "ec2:DescribeInstanceAttribute",
+      "Resource": "arn:aws:ec2:eu-west-2:<account-id>:instance/*",
+      "Condition": {
+        "StringEquals": {
+          "ec2:ResourceTag/Project": "focused-delivery-recovery"
+        }
+      }
+    },
+    {
+      "Sid": "ReadLondonInstanceCredits",
+      "Effect": "Allow",
+      "Action": "ec2:DescribeInstanceCreditSpecifications",
+      "Resource": "*",
+      "Condition": {
+        "StringEquals": {
+          "ec2:Region": "eu-west-2"
+        }
+      }
+    },
+    {
+      "Sid": "LaunchInstanceResource",
+      "Effect": "Allow",
+      "Action": "ec2:RunInstances",
+      "Resource": "arn:aws:ec2:eu-west-2:<account-id>:instance/*",
+      "Condition": {
+        "StringEquals": {
+          "aws:RequestTag/Project": "focused-delivery-recovery"
+        }
+      }
+    },
+    {
+      "Sid": "LaunchReviewedDependencies",
+      "Effect": "Allow",
+      "Action": "ec2:RunInstances",
+      "Resource": [
+        "arn:aws:ec2:eu-west-2::image/*",
+        "arn:aws:ec2:eu-west-2:<account-id>:subnet/*",
+        "arn:aws:ec2:eu-west-2:<account-id>:security-group/*",
+        "arn:aws:ec2:eu-west-2:<account-id>:volume/*",
+        "arn:aws:ec2:eu-west-2:<account-id>:network-interface/*"
+      ]
+    },
+    {
+      "Sid": "ProjectComputeCreate",
+      "Effect": "Allow",
+      "Action": "ec2:CreateVolume",
+      "Resource": "arn:aws:ec2:eu-west-2:<account-id>:volume/*",
+      "Condition": {
+        "StringEquals": {
+          "aws:RequestTag/Project": "focused-delivery-recovery"
+        }
+      }
+    },
+    {
+      "Sid": "ProjectCreateTagsOnCreate",
+      "Effect": "Allow",
+      "Action": "ec2:CreateTags",
+      "Resource": [
+        "arn:aws:ec2:eu-west-2:<account-id>:instance/*",
+        "arn:aws:ec2:eu-west-2:<account-id>:volume/*",
+        "arn:aws:ec2:eu-west-2:<account-id>:security-group/*",
+        "arn:aws:ec2:eu-west-2:<account-id>:network-interface/*",
+        "arn:aws:ec2:eu-west-2:<account-id>:snapshot/*"
+      ],
+      "Condition": {
+        "StringEquals": {
+          "ec2:CreateAction": [
+            "RunInstances",
+            "CreateVolume",
+            "CreateSecurityGroup",
+            "CreateSnapshot"
+          ]
+        }
+      }
+    },
+    {
+      "Sid": "ProjectCreateTagsOwnedResources",
+      "Effect": "Allow",
+      "Action": "ec2:CreateTags",
+      "Resource": [
+        "arn:aws:ec2:eu-west-2:<account-id>:instance/*",
+        "arn:aws:ec2:eu-west-2:<account-id>:volume/*",
+        "arn:aws:ec2:eu-west-2:<account-id>:security-group/*",
+        "arn:aws:ec2:eu-west-2:<account-id>:network-interface/*",
+        "arn:aws:ec2:eu-west-2:<account-id>:snapshot/*"
+      ],
+      "Condition": {
+        "StringEquals": {
+          "aws:ResourceTag/Project": "focused-delivery-recovery"
+        }
+      }
+    },
+    {
+      "Sid": "CreateSecurityGroupInReviewedVpc",
+      "Effect": "Allow",
+      "Action": "ec2:CreateSecurityGroup",
+      "Resource": [
+        "arn:aws:ec2:eu-west-2:<account-id>:vpc/*",
+        "arn:aws:ec2:eu-west-2:<account-id>:security-group/*"
+      ]
+    },
+    {
+      "Sid": "ProjectComputeMutate",
+      "Effect": "Allow",
+      "Action": [
+        "ec2:AttachVolume",
+        "ec2:AuthorizeSecurityGroupEgress",
+        "ec2:DeleteSecurityGroup",
+        "ec2:DeleteTags",
+        "ec2:DeleteVolume",
+        "ec2:DetachVolume",
+        "ec2:ModifyVolume",
+        "ec2:RevokeSecurityGroupEgress",
+        "ec2:TerminateInstances"
+      ],
+      "Resource": [
+        "arn:aws:ec2:eu-west-2:<account-id>:instance/*",
+        "arn:aws:ec2:eu-west-2:<account-id>:volume/*",
+        "arn:aws:ec2:eu-west-2:<account-id>:security-group/*"
+      ],
+      "Condition": {
+        "StringEquals": {
+          "aws:ResourceTag/Project": "focused-delivery-recovery"
+        }
+      }
+    },
+    {
+      "Sid": "ProjectSnapshotDrillCreate",
+      "Effect": "Allow",
+      "Action": "ec2:CreateSnapshot",
+      "Resource": "arn:aws:ec2:eu-west-2:<account-id>:volume/*",
+      "Condition": {
+        "StringEquals": {
+          "aws:ResourceTag/Project": "focused-delivery-recovery",
+          "aws:RequestTag/Project": "focused-delivery-recovery"
+        }
+      }
+    },
+    {
+      "Sid": "ProjectSnapshotDrillDelete",
+      "Effect": "Allow",
+      "Action": "ec2:DeleteSnapshot",
+      "Resource": "arn:aws:ec2:eu-west-2:<account-id>:snapshot/*",
+      "Condition": {
+        "StringEquals": {
+          "aws:ResourceTag/Project": "focused-delivery-recovery"
+        }
+      }
+    },
+    {
+      "Sid": "EcrLogin",
+      "Effect": "Allow",
+      "Action": "ecr:GetAuthorizationToken",
+      "Resource": "*"
+    },
+    {
+      "Sid": "ProjectEcrLifecycleAndPush",
+      "Effect": "Allow",
+      "Action": [
+        "ecr:BatchCheckLayerAvailability",
+        "ecr:BatchDeleteImage",
+        "ecr:BatchGetImage",
+        "ecr:CompleteLayerUpload",
+        "ecr:CreateRepository",
+        "ecr:DeleteRepository",
+        "ecr:DeleteRepositoryPolicy",
+        "ecr:GetDownloadUrlForLayer",
+        "ecr:InitiateLayerUpload",
+        "ecr:PutImage",
+        "ecr:PutImageScanningConfiguration",
+        "ecr:PutImageTagMutability",
+        "ecr:PutLifecyclePolicy",
+        "ecr:SetRepositoryPolicy",
+        "ecr:TagResource",
+        "ecr:UntagResource",
+        "ecr:UploadLayerPart",
+        "ecr:DeleteLifecyclePolicy"
+      ],
+      "Resource": "arn:aws:ecr:eu-west-2:<account-id>:repository/focused-delivery-recovery"
+    },
+    {
+      "Sid": "ProjectLogLifecycle",
+      "Effect": "Allow",
+      "Action": [
+        "logs:CreateLogGroup",
+        "logs:DeleteLogGroup",
+        "logs:PutRetentionPolicy",
+        "logs:TagResource",
+        "logs:UntagResource"
+      ],
+      "Resource": "arn:aws:logs:eu-west-2:<account-id>:log-group:/aws/delivery-recovery/app:*"
+    },
+    {
+      "Sid": "PassOnlyReviewedRuntimeRole",
+      "Effect": "Allow",
+      "Action": "iam:PassRole",
+      "Resource": "arn:aws:iam::<account-id>:role/focused-delivery-recovery-runtime",
+      "Condition": {
+        "StringEquals": {
+          "iam:PassedToService": "ec2.amazonaws.com"
+        }
+      }
+    },
+    {
+      "Sid": "ReadLondonNetworkInterfaces",
+      "Effect": "Allow",
+      "Action": "ec2:DescribeNetworkInterfaces",
+      "Resource": "*",
+      "Condition": {
+        "StringEquals": {
+          "ec2:Region": "eu-west-2"
+        }
+      }
+    }
+  ]
+}

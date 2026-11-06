@@ -1,0 +1,2 @@
+# Local Phase 4 IAM/credential tooling (not the application runtime image)
+boto3==1.43.123

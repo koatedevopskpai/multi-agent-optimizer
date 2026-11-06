@@ -1,0 +1,37 @@
+{
+  "schema_version": "planning-fixture-v1",
+  "synthetic": true,
+  "tasks": {
+    "S": {
+      "duration": 1
+    },
+    "P": {
+      "duration": 3,
+      "dependencies": [
+        "S"
+      ]
+    },
+    "Q": {
+      "duration": 3,
+      "dependencies": [
+        "S"
+      ]
+    },
+    "E": {
+      "duration": 1,
+      "dependencies": [
+        "P",
+        "Q"
+      ]
+    }
+  },
+  "expected": {
+    "baseline_finish": 5,
+    "P_only_finish": 5,
+    "P_only_task_reduction": 1,
+    "P_only_project_saving": 0,
+    "P_and_Q_finish": 4,
+    "P_and_Q_project_saving": 1
+  },
+  "note": "Reduce P and/or Q from 3 to 2. These are synthetic candidate inputs; this fixture does not implement approval or an agent."
+}
