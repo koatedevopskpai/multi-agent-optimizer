@@ -1,5 +1,16 @@
 # Phase 4 IAM proposals
 
+## Optional OIDC branch binding
+
+The OIDC subjects in the trust templates and Terraform defaults name the original
+private audit branch as a historical reference. Before rendering an OIDC deployment
+policy, replace the repository and branch subject with the exact intended deployment
+ref and review it independently. Do not assume this portfolio branch can assume a
+cloud role: this publication's CI only tests the code and does not deploy to AWS.
+The named-profile reference path does not require GitHub OIDC.
+
+## Scope
+
 These files are review material only. They are not applied, imported or attached
 by the preparation work.
 

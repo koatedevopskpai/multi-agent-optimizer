@@ -8,6 +8,7 @@ This portfolio branch starts at public baseline **4b3653a8456531facdc5f570205ff7
 
 - Reviewer-focused introduction, business case, architecture, quality/evidence and demo guides.
 - Portable home-directory lookup in helper scripts; generalized synthetic MFA fixture.
+- Development dependencies explicitly include the pinned SDK required to collect mocked IAM bootstrap tests; no missing-dependency skip is used.
 - Personal paths/account/resource identifiers removed from publication copies of historical docs, which are explicitly labelled as adapted references.
 - Deploy-policy template includes the final reviewed lifecycle deletion and London-only network-interface inventory permissions. Publishing a template does not change live IAM.
 - Twelve approved derivatives copied without byte changes; [approved-images.json](approved-images.json) records their hashes.

@@ -1,4 +1,4 @@
-> Historical engineering reference, adapted for publication. Execution packets and approval states below belong to the original development sequence; they are not current authorization or a turnkey deployment guide. Start with [the current portfolio guide](/docs/portfolio/START_HERE.md). Personal paths and identifiers have been replaced; original byte-preserved records remain in the private audit archive.
+> Historical engineering reference, adapted for publication. Execution packets and approval states below belong to the original development sequence; they are not current authorization or a turnkey deployment guide. Start with [the current portfolio guide](../portfolio/START_HERE.md). Personal paths and identifiers have been replaced; original byte-preserved records remain in the private audit archive.
 
 # Phase 2 diagnostic: schema-invalid model output
 
@@ -9,7 +9,7 @@ Status: controlled fake-provider exercise, 2 November 2026. This is not a produc
 - Scenario: synthetic utilities recovery, baseline 15, disrupted 17, budget GBP 2,000.
 - Provider: `FakeProvider` returning invalid JSON twice.
 - Workflow: typed LangGraph intake → compute → assistant → validate/fallback.
-- Source revision and exact run: recorded in the run manifest under `evidence/delivery-recovery/runs/DR-P2-*`.
+- Source revision and exact run: recorded under `evidence/delivery-recovery/runs/DR-P2-*` in the private original audit archive. That raw evidence directory is intentionally absent from this publication branch.
 - Network calls: zero. No provider credentials or LangSmith export were used.
 
 ## Symptom and competing hypotheses

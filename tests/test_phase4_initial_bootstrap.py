@@ -18,7 +18,7 @@ import phase4_initial_bootstrap as bootstrap  # noqa: E402
 import phase4_review_receipt as receipt_module  # noqa: E402
 
 ACCOUNT = "123456789012"
-PRINCIPAL = f"arn:aws:iam::{ACCOUNT}:user/koate"
+PRINCIPAL = f"arn:aws:iam::{ACCOUNT}:user/demo-user"
 MFA_SERIAL = f"arn:aws:iam::{ACCOUNT}:mfa/demo-user"
 SESSION_SECRET = "session-secret"
 SESSION_TOKEN = "session-token"

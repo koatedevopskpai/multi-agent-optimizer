@@ -17,7 +17,9 @@ These results belong to the curated publication checkout, separately from the or
 
 ## Environment and limits
 
-Windows, CPython 3.14.5 and existing installed backend dependencies; `PYTHONPATH` explicitly selected this checkout's `src`. Frontend dependencies were freshly installed with `npm ci`. The backend was not independently installed into a fresh Python 3.12 environment here. CI is configured for Python 3.12/Ubuntu and has not run for this unpublished branch.
+Windows, CPython 3.14.5. Following packaging review, the final backend rerun used this checkout's own `.venv` after the documented `python -m pip install -e ".[dev,langgraph]"`, with no `PYTHONPATH` override and no excluded test modules. `pip check` passed and imports resolved to the portfolio source. Frontend dependencies were freshly installed with `npm ci` in the earlier unchanged-UI check. No fresh Python 3.12/Linux environment result is claimed; remote CI has not run for this unpublished branch.
+
+The review found that the earlier shared backend environment already contained `boto3`, hiding a missing development dependency. The `dev` extra now explicitly includes `boto3==1.43.123`, matching the IAM tooling requirements. Bootstrap tests are collected and executed with mocks rather than skipped for a missing SDK. The corrected project-local rerun again passed 559 tests with the same five OS-dependent skips and 93.94% coverage; all 11 golden cases passed.
 
 Four POSIX harness tests skipped because WSL is inaccessible in the execution sandbox. A fifth hardlink-preservation test skipped because Windows denied hardlink creation. The publication runner executes POSIX harnesses using native bash on Linux; its disposable-mount harness requires root/passwordless sudo. These skips are explicit limitations, not passes. Earlier attempts hit sandbox temporary-directory restrictions; the final run used a writable dedicated test directory.
 
