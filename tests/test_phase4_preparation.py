@@ -105,10 +105,10 @@ def test_backup_export_aborts_on_stop_or_mount_failure():
 
 
 def test_restore_runbook_stages_inside_the_data_mount():
-    text = (DOCS / "runbooks/backup-restore.md").read_text(encoding="utf-8")
+    text = (REPO / "docs/operations/REFERENCE_OPERATIONS.md").read_text(encoding="utf-8")
     assert "/srv/delivery-recovery/data/restore/<run-id>" in text
-    assert "restore-check" not in text
     assert "restore-switch.sh switch" in text
+    assert "consistent" in text.lower()
 
 
 def test_iam_policies_parse_and_avoid_broad_administrative_actions():
@@ -133,57 +133,27 @@ def test_iam_policies_parse_and_avoid_broad_administrative_actions():
             assert forbidden not in actions
 
 
-def test_runbooks_and_review_packet_exist():
-    for name in (
-        "PHASE4_DEPLOYMENT_PLAN.md",
-        "PHASE4_DEPLOYMENT_REVIEW_PACKET.md",
-        "PHASE4_COST_ESTIMATE.md",
-        "PHASE4_IAM_MATRIX.md",
-        "PHASE4_ACCESS_AND_SEQUENCE.md",
-        "runbooks/deploy.md",
-        "runbooks/smoke.md",
-        "runbooks/failure-recovery.md",
-        "runbooks/rollback.md",
-        "runbooks/backup-restore.md",
-        "runbooks/pause-resume.md",
-        "runbooks/teardown.md",
-        "runbooks/recreation.md",
-    ):
-        path = DOCS / name
-        assert path.is_file(), name
-        assert path.read_text(encoding="utf-8").strip()
+def test_public_documentation_has_no_private_review_packets():
+    for name in ("README.md", "docs/operations/REFERENCE_OPERATIONS.md", "docs/portfolio/DECISIONS.md", "docs/portfolio/QUALITY_AND_EVIDENCE.md"):
+        assert (REPO / name).is_file()
+    for name in ("docs/portfolio/DEMO_GUIDE.md", "docs/delivery-recovery/PHASE4_ACCESS_AND_SEQUENCE.md", "docs/delivery-recovery/runbooks/recreation.md", "docs/delivery-recovery/phase4-active-iam-manifest.json"):
+        assert not (REPO / name).exists()
 
 
-def test_cost_estimate_is_below_the_approved_ceiling_and_includes_vat():
-    estimate = json.loads(
-        (DOCS / "phase4-cost-estimate.json").read_text(encoding="utf-8")
-    )
+def test_cost_estimate_arithmetic_and_local_output(tmp_path, monkeypatch):
+    import sys
+    sys.path.insert(0, str(REPO / "scripts"))
+    import phase4_cost_estimate as estimator
+    monkeypatch.setattr(estimator, "DOCS", tmp_path)
+    assert estimator.main() == 0
+    estimate = json.loads((tmp_path / "phase4-cost-estimate.json").read_text(encoding="utf-8"))
+    expected_usd = sum(estimate["line_items_usd"].values())
+    assert abs(estimate["subtotal_usd"] - expected_usd) < 0.001
+    assert abs(estimate["total_gbp"] - expected_usd * estimator.USD_TO_GBP * (1 + estimator.VAT_RATE)) < 0.001
     assert estimate["includes_vat"] is True
-    assert estimate["vat_rate"] == 0.2
-    assert estimate["total_gbp"] < 20
-    assert estimate["stop_threshold_gbp"] < 20
-    assert estimate["total_gbp"] < estimate["stop_threshold_gbp"]
     assert estimate["currency"] == "GBP"
     assert estimate["credit_mode"] == "standard"
-    assert estimate["scenario"]["interview_deployment_hours"] == 8.0
-    assert estimate["scenario"]["compute_hours"] >= 32.0
-    assert abs(
-        estimate["compute_and_address_gbp"]
-        + estimate["retained_recurring_gbp"]
-        - estimate["subtotal_gbp"]
-    ) < 0.01
-    provenance = json.loads(
-        (DOCS / "phase4-pricing-provenance.json").read_text(encoding="utf-8")
-    )
-    assert provenance["fx"]["date"]
-    assert provenance["fx"]["rate"] > 0
-    for name, rate in estimate["rate_provenance"].items():
-        assert rate["status"] in {"retrieved", "assumption"}
-        if rate["status"] == "retrieved":
-            assert rate["sku"]
-            assert rate["unit"]
-            assert rate["price_usd"] > 0
-    assert (
-        estimate["rate_provenance"]["internet_egress_gb_usd"]["status"]
-        == "assumption"
-    )
+    assert abs(estimate["compute_and_address_gbp"] + estimate["retained_recurring_gbp"] - estimate["subtotal_gbp"]) < 0.01
+    assert "approved_total_ceiling_gbp" not in estimate
+    assert "interview_deployment_hours" not in estimate["scenario"]
+    assert estimator.DOCS == tmp_path

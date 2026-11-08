@@ -131,32 +131,20 @@ def test_standard_chain_keeps_runner_credentials_but_removes_profile():
     assert "AWS_DEFAULT_PROFILE" not in env
 
 
-def test_access_sequence_uses_stage_exec_and_exit_guards():
-    text = (REPO / "docs/delivery-recovery/PHASE4_ACCESS_AND_SEQUENCE.md").read_text(
-        encoding="utf-8"
-    )
+def test_public_operations_uses_stage_exec_and_exit_guards():
+    text = (REPO / "docs/operations/REFERENCE_OPERATIONS.md").read_text(encoding="utf-8")
     assert "phase4_stage_exec.py" in text
-    assert "phase4_stage_preflight.py" not in text
     assert "terraform.bootstrap.tfvars" in text
     assert "terraform.deploy.tfvars" in text
-    assert any(x in text for x in ("--var-file terraform.bootstrap.tfvars", "-var-file=terraform.bootstrap.tfvars", "--var-file terraform.bootstrap-session.tfvars"))
-    assert "--var-file terraform.deploy.tfvars" in text or "-var-file=terraform.deploy.tfvars" in text
     assert "if ($LASTEXITCODE -ne 0)" in text
-    assert "does not change the caller's PowerShell environment" in " ".join(text.split())
-    assert "OIDC path: use short-lived bootstrap role credentials" not in text
-    assert "docker push <registry>/focused-delivery-recovery@sha256:<digest>" not in text
-    assert "AWS_PROFILE = \"focused-deploy\"" not in text
+    assert "same child process" in text
 
 
 def test_deploy_runbook_has_valid_build_tag_push_digest_sequence():
-    text = (REPO / "docs/delivery-recovery/runbooks/deploy.md").read_text(
-        encoding="utf-8"
-    )
-    tag = text.index("docker tag delivery-recovery:phase4")
+    text = (REPO / "docs/operations/REFERENCE_OPERATIONS.md").read_text(encoding="utf-8")
+    tag = text.index("docker tag delivery-recovery:local")
     push = text.index('docker push "${Registry}/focused-delivery-recovery:${Tag}"')
     readback = text.index("aws ecr describe-images")
     assert tag < push < readback
-    assert "docker push <registry>" not in text
-    assert "docker push \"${Registry}/focused-delivery-recovery@sha256" not in text
-    assert "image-ids imageTag=$Tag" in text
-    assert "--query 'imageDetails[0].imageDigest'" in text
+    assert "imageTag=$Tag" in text
+    assert "imageDetails[0].imageDigest" in text

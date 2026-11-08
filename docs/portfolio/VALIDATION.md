@@ -1,32 +1,25 @@
-# Publication validation — 6 November 2026
+# Verification results
 
-These results belong to the curated publication checkout, separately from the original audit evidence.
+## Ubuntu / Python 3.12
+
+[CI run on 8 November 2026](https://github.com/koatedevopskpai/multi-agent-optimizer/actions/runs/42446775012), commit `d5f4032`, Ubuntu 26.04.1 / CPython 3.12.16:
 
 | Check | Observed result |
 |---|---|
-| Python suite | **559 passed, 5 skipped**, 14 warnings; coverage **93.94%** |
-| Required branch-only gates | All six module thresholds passed (at least 90%) |
-| Golden evaluation | **11/11 passed** |
-| Frontend interaction tests | **8 passed**, 2 files |
-| Production UI build | Passed; 18 modules transformed |
-| Application smoke | `/readyz`, `/ui/`, `/openapi.json` each returned HTTP200 via TestClient against the built UI |
-| npm audit | Zero reported vulnerabilities at all severities |
-| Trivy filesystem secret scan | Zero detected secrets; package/image vulnerability scanning is a different check |
-| Image identity | All 12 selected derivatives match their approved SHA256 values |
-| Audit archive | Complete Git bundle verified; original branch tip preserved |
+| Python tests | 564 passed, no test skips |
+| Combined line/branch coverage | 93.92% |
+| Required branch-only coverage | All six module thresholds passed |
+| Golden evaluation | 11/11 passed |
+| Frontend tests | 8 passed across 2 files |
+| Production UI build | Passed |
+| npm dependency audit | Zero reported vulnerabilities |
 
-## Environment and limits
+The initial Linux run identified a missing executable flag on a shell script. The corrected run above executed the POSIX and hardlink checks successfully. Local Windows results are separate observations and are not substituted for Linux verification. Later documentation/tooling changes require their own CI result; the linked run remains the dated baseline above.
 
-Windows, CPython 3.14.5. Following packaging review, the final backend rerun used this checkout's own `.venv` after the documented `python -m pip install -e ".[dev,langgraph]"`, with no `PYTHONPATH` override and no excluded test modules. `pip check` passed and imports resolved to the portfolio source. Frontend dependencies were freshly installed with `npm ci` in the earlier unchanged-UI check. No fresh Python 3.12/Linux environment result is claimed; remote CI has not run for this unpublished branch.
+## Reproduction
 
-The review found that the earlier shared backend environment already contained `boto3`, hiding a missing development dependency. The `dev` extra now explicitly includes `boto3==1.43.123`, matching the IAM tooling requirements. Bootstrap tests are collected and executed with mocks rather than skipped for a missing SDK. The corrected project-local rerun again passed 559 tests with the same five OS-dependent skips and 93.94% coverage; all 11 golden cases passed.
+Follow the root README. The `dev` extra includes the pinned SDK used by mocked IAM tests. Cloud identities and real provider keys are not needed for CI. Terraform tests use its built-in provider; POSIX harnesses use mocked service/device commands and a disposable filesystem. The mount harness requires root or passwordless sudo on Linux. Unavailable platform capabilities are reported as explicit skips.
 
-Four POSIX harness tests skipped because WSL is inaccessible in the execution sandbox. A fifth hardlink-preservation test skipped because Windows denied hardlink creation. The publication runner executes POSIX harnesses using native bash on Linux; its disposable-mount harness requires root/passwordless sudo. These skips are explicit limitations, not passes. Earlier attempts hit sandbox temporary-directory restrictions; the final run used a writable dedicated test directory.
+The six coverage gates apply to candidate policy, contracts, provider execution, graph transitions, HTTP provider and trace export. Combined coverage is not presented as a branch-only percentage.
 
-Coverage is the suite's combined line/branch measure, not a branch-only percentage. Required module branch-only thresholds are checked separately by the existing CI gate. The original historical AWS results are not rerun or newly claimed by these local checks. No AWS mutation, paid model call, push or publication occurred.
-
-## Reproduce
-
-Use the README commands. Local Windows sandbox users may need a writable `--basetemp` outside the checkout. Record skipped tests honestly and run the Linux CI job before treating those OS-dependent checks as verified for the publication branch. CI also installs Terraform for the local built-in-provider lifecycle tests; no AWS credentials are required.
-
-Raw local validation logs stay outside the publication package to avoid exposing personal paths. Content identity is recorded in `release-manifest.json`; image bytes are also pinned separately in `approved-images.json`.
+Historical cloud recovery results are described in [quality and evidence](QUALITY_AND_EVIDENCE.md). No current clean container-vulnerability attestation, production load result or disaster-recovery claim follows from these test results.

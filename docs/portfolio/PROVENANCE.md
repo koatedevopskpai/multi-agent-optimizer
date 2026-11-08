@@ -1,23 +1,9 @@
-# Audit preservation and publication provenance
+# Evidence provenance
 
-The original `feature/focused-delivery-recovery` branch remains unchanged at **6be9f33eb5e0de2f9c571ccb1231e0352d1cb971**. Its 145 commits beyond the public baseline and original evidence retain their identities. A verified private Git bundle records its complete history. Raw screenshots, backups and private execution state remain outside this publication branch.
+This repository contains a curated engineering reference using synthetic projects, costs and permissions. Source code, tests, dated results and selected redacted screenshots support its claims. Detailed original development records are preserved separately; this public snapshot does not claim to expose every raw operational artifact.
 
-This portfolio branch starts at public baseline **4b3653a8456531facdc5f570205ff7a5863fc1b6**, with a curated snapshot. It does not rewrite the audit branch. Original commit IDs in adapted historical documents identify private provenance, not necessarily publicly accessible GitHub commits.
+The [release manifest](release-manifest.json) records SHA256 values for published file bytes. [Approved images](approved-images.json) records the exact screenshot derivatives accepted by individual visual privacy review. Image masks remove private details without altering visible results. Screenshots show historical states and must be read with their dates and documented limitations.
 
-## Publication changes
+New documentation summaries do not rewrite original experiment records. A new derivative has its own hash; unchanged images retain theirs. Text is checked out with LF line endings, while images are binary. Verify the published snapshot using `python scripts/verify_portfolio_manifest.py`.
 
-- Reviewer-focused introduction, business case, architecture, quality/evidence and demo guides.
-- Portable home-directory lookup in helper scripts; generalized synthetic MFA fixture.
-- Development dependencies explicitly include the pinned SDK required to collect mocked IAM bootstrap tests; no missing-dependency skip is used.
-- Personal paths/account/resource identifiers removed from publication copies of historical docs, which are explicitly labelled as adapted references.
-- Deploy-policy template includes the final reviewed lifecycle deletion and London-only network-interface inventory permissions. Publishing a template does not change live IAM.
-- Twelve approved derivatives copied without byte changes; [approved-images.json](approved-images.json) records their hashes.
-- Raw development evidence/log archives excluded; attributed summaries distinguish historical measurements from current reruns.
-- Portable POSIX test runner uses native bash on Linux and WSL on Windows; unavailable execution environments are explicitly skipped. CI installs Terraform for the local built-in-provider regression tests.
-- LF text checkout policy; binary images retain exact bytes.
-
-Commit hashes identify Git history; SHA256 identifies artifact bytes. New publication commits do not change original history or evidence. Edited documents are new derivatives; unchanged images retain their approved hashes. The [release manifest](release-manifest.json) records source and publication hashes. The private audit bundle and detailed local review records are retained outside the public package.
-
-AI coding/review tools assisted implementation, tests and evidence preparation. Koate owns the engineering decisions and demonstration. Synthetic scenarios and a controlled reference are distinct from customer production experience.
-
-Preparation does not push, merge, change repository visibility, deploy cloud resources or publish anything.
+AI coding and review tools assisted implementation, testing and evidence preparation. Koate Kpai owns the engineering decisions. This synthetic reference is distinct from client production experience.

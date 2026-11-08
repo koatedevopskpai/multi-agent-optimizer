@@ -9,6 +9,10 @@ private/
 *.private.json
 # Generated operational evidence needs separate publication review.
 evidence/delivery-recovery/
+# Personal preparation and internal operational records are local-only.
+local-preparation/
+interview-preparation/
+private-operations/
 
 # Python
 __pycache__/

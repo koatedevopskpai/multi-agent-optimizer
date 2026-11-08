@@ -28,6 +28,6 @@ Integer working-day offsets; finish-to-start, zero-lag dependencies. Catalogue r
 | Provider failure/invalid narrative | Visible deterministic fallback/degraded reason |
 | Pending approval at process restart | Recover wait and commit one decision |
 
-Fixtures are under `tests/fixtures/delivery_recovery`. Candidate, contract, workflow, API, store and approval tests exercise these boundaries. Historical mapping in `docs/delivery-recovery/requirements_traceability.csv` is not a declaration that every planned NFR was achieved.
+Fixtures are under `tests/fixtures/delivery_recovery`. Candidate, contract, workflow, API, store and approval tests exercise these boundaries. The current acceptance matrix is in [engineering decisions](DECISIONS.md).
 
 Delivered journey: evaluate → durable run → human decision → revision/audit → process recovery. Next: PostgreSQL test. Federation, multi-instance coordination, host-loss recovery and production operation require separate design and evidence.

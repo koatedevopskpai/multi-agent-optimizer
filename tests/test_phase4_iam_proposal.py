@@ -328,20 +328,11 @@ def test_ssm_action_resource_support_map_matches_official_semantics():
         assert actual.get(action) == resources, (action, actual.get(action))
 
 
-def test_matrix_document_exists_and_names_all_identities():
-    text = (REPO / "docs/delivery-recovery/PHASE4_IAM_MATRIX.md").read_text(
-        encoding="utf-8"
-    )
-    for identity in (
-        "Local named-profile deployer",
-        "GitHub OIDC deploy role",
-        "Operator",
-        "EC2 runtime role",
-        "One-time IAM bootstrap",
-    ):
+def test_public_role_matrix_separates_runtime_and_control_authority():
+    text = (REPO / "infra/iam/README.md").read_text(encoding="utf-8")
+    for identity in ("Bootstrap", "Deploy", "Operator", "Runtime"):
         assert identity in text
-    assert "evidence that the proposed policies work" in text
-    assert "**not**" in text
+    assert "not application authentication" in text
 
 
 def test_bootstrap_boundary_operations_and_trust_paths():
@@ -396,28 +387,20 @@ def test_instance_provider_reads_are_scoped_without_extra_writes():
     assert all(s["Effect"] == "Allow" for s in selected)
 
 
-def test_active_manifest_excludes_optional_oidc_and_pins_scope():
-    manifest = json.loads(
-        (REPO / "docs/delivery-recovery/phase4-active-iam-manifest.json").read_text(
-            encoding="utf-8"
-        )
-    )
+def test_active_manifest_excludes_optional_oidc_and_pins_scope(tmp_path):
+    import sys
+    sys.path.insert(0, str(REPO / "scripts"))
+    import phase4_iam_manifest as builder
+    for name in (*builder.ACTIVE, *builder.EXCLUDED_OIDC):
+        (tmp_path / name).write_text('{"synthetic":true}', encoding="utf-8")
+    manifest = builder.build_manifest(tmp_path, REPO / "infra/terraform/main.tf")
     assert manifest["active_document_count"] == 9
     assert manifest["excluded_optional_oidc_count"] == 2
-    assert "github-oidc-trust-policy.json" not in manifest["active_documents"]
-    assert "deploy-trust-policy.json" not in manifest["active_documents"]
-    assert set(manifest["excluded_optional_oidc"]) == {
-        "github-oidc-trust-policy.json",
-        "deploy-trust-policy.json",
-    }
-    validation = manifest.get("validation")
-    if validation is not None:
-        assert validation["status"] == "passed"
-        assert validation["findings"] == 0
+    assert set(manifest["excluded_optional_oidc"]) == {"github-oidc-trust-policy.json", "deploy-trust-policy.json"}
+    assert not set(manifest["excluded_optional_oidc"]) & set(manifest["active_documents"])
     assert len(manifest["terraform_generated_source"]["sha256"]) == 64
-    text = json.dumps(manifest)
-    assert "arn:aws:" not in text
-    assert not __import__("re").search(r"\b\d{12}\b", text)
+    assert "arn:aws:" not in json.dumps(manifest)
+    assert not __import__("re").search(r"\b\d{12}\b", json.dumps(manifest))
 
 
 def test_describe_vpc_attribute_is_isolated_and_vpc_scoped():

@@ -9,7 +9,7 @@ from datetime import datetime, timezone
 from pathlib import Path
 
 REPO = Path(__file__).resolve().parents[1]
-DOCS = REPO / "docs" / "delivery-recovery"
+DOCS = REPO / "var" / "phase4" / "cost-reports"
 PROFILE = "default"
 REGION = "eu-west-2"
 LOCATION = "EU (London)"
