@@ -36,4 +36,4 @@ Historical deployment used native ARM64 `t4g.medium`, encrypted 10GB root/20GB d
 
 This proves the recorded restore/switch/controlled-restart/rollback path on surviving infrastructure. It does not prove host/volume-loss recovery, HA, spontaneous crash, snapshot recovery or AWS recreation. Recorded image findings require fresh assessment before redeployment.
 
-`infra/` and `scripts/phase4_*` retain reference tooling. Live state, policies rendered for a real account and approval receipts are private. Historical runbooks can refer to private orchestration assets: they are design context, not executable approval or a turnkey cloud guide.
+`infra/` and `scripts/phase4_*` retain reference tooling. Live state, policies rendered for a real account and approval receipts are private. [Reference operations](../operations/REFERENCE_OPERATIONS.md) explains the generic lifecycle and required environment-specific checks.

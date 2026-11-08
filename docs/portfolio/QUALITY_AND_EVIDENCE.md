@@ -21,9 +21,9 @@
 
 ## Attributed historical results
 
-Original checkpoints report 564 full-suite tests, 96 targeted, 56 backup/restore and 30 restore-window tests. These overlap and must not be added together. Three recorded local restart observations were approximately 1.5–1.6 seconds; they are not a latency distribution. The accepted AWS restore/switch/restart/terminal-rollback execution took 176.835 seconds across 12 successful SSM commands, verifying one run, one approved revision and four audit events. Final cleanup's remaining three deletions completed successfully, with recorded absence checks and retained-asset hashes independently reconciled.
+Three recorded local restart observations were approximately 1.5–1.6 seconds; they are not a latency distribution. The accepted AWS restore/switch/restart/terminal-rollback execution took 176.835 seconds across 12 successful SSM commands, verifying one run, one approved revision and four audit events. Final cleanup's remaining three deletions completed successfully, with recorded absence checks and retained-asset hashes independently reconciled.
 
-The publication rerun is separate: [VALIDATION.md](VALIDATION.md). Raw logs, state and execution receipts remain private with the original audit history. This curated account can be supplemented in a controlled review.
+Current automated verification is recorded in [VALIDATION.md](VALIDATION.md). Raw logs, state and execution receipts are not part of the public evidence set; screenshots alone do not establish every underlying logical assertion.
 
 ## Not established
 

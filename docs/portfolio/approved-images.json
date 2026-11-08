@@ -3,87 +3,74 @@
     {
       "path": "docs/portfolio/images/CP-UI-01-utilities.jpg",
       "sha256": "7b1f381ab73d0c39b77ae8356f3b1010513051f8d1900ad27a0d69be21bfeff7",
-      "privacy_review": "Codex, 2026-11-05; individual visible-pixel review accepted",
-      "historical": true,
-      "original_capture_relative_path": "reviewer-pack/Phase1_Browser_Verification_2026-11-02/screenshots/CP-UI-01-utilities.jpg"
+      "privacy_review": "Individual visible-pixel redaction review accepted, 2026-11-05",
+      "historical": true
     },
     {
       "path": "docs/portfolio/images/CP07_FINAL_ENCRYPTED_DISKS.jpg",
       "sha256": "7539eb8ef17a20309266e24e9c552191111f6571cd0f5e09ef9ded5b9242c89e",
-      "privacy_review": "Codex, 2026-11-05; individual visible-pixel review accepted",
-      "historical": true,
-      "original_capture_relative_path": "screenshots/private/2026-11-05/CP07_FINAL_ENCRYPTED_DISKS.jpg"
+      "privacy_review": "Individual visible-pixel redaction review accepted, 2026-11-05",
+      "historical": true
     },
     {
       "path": "docs/portfolio/images/CP-05-stale-conflict.jpg",
       "sha256": "d8c8a5b8237d848e620974a7792938d868feebab66128f052921d58244057897",
-      "privacy_review": "Codex, 2026-11-05; individual visible-pixel review accepted",
-      "historical": true,
-      "original_capture_relative_path": "screenshots/reviewer/PHASE3_FINAL_2026-11-03/CP-05-stale-conflict.jpg"
+      "privacy_review": "Individual visible-pixel redaction review accepted, 2026-11-05",
+      "historical": true
     },
     {
       "path": "docs/portfolio/images/CP-02-root.png",
       "sha256": "6757a63a7aa81ac208e73616d629a96a15eead6dae114a440b205c48f1e0d15c",
-      "privacy_review": "Codex, 2026-11-05; individual visible-pixel review accepted",
-      "historical": true,
-      "original_capture_relative_path": "screenshots/reviewer/LANGSMITH_CORRECTED_2026-11-02/CP-02-root.png"
+      "privacy_review": "Individual visible-pixel redaction review accepted, 2026-11-05",
+      "historical": true
     },
     {
       "path": "docs/portfolio/images/CP07_FINAL_EC2_STOPPED.jpg",
       "sha256": "489e8359cbcbc5ae81f1dc5f5ae30d218f1af8bd1d568fe299c4547d367e3765",
-      "privacy_review": "Codex, 2026-11-05; individual visible-pixel review accepted",
-      "historical": true,
-      "original_capture_relative_path": "screenshots/private/2026-11-05/CP07_FINAL_EC2_STOPPED.jpg"
+      "privacy_review": "Individual visible-pixel redaction review accepted, 2026-11-05",
+      "historical": true
     },
     {
       "path": "docs/portfolio/images/CP07_CLOUDWATCH_TERMINAL_READINESS.jpg",
       "sha256": "4a5301888457b9290b59b0bb0495fddd938c7c9d5cef59c8d9a4f7dfaab44ae8",
-      "privacy_review": "Codex, 2026-11-05; individual visible-pixel review accepted",
-      "historical": true,
-      "original_capture_relative_path": "screenshots/private/2026-11-05/CP07_CLOUDWATCH_TERMINAL_READINESS.jpg"
+      "privacy_review": "Individual visible-pixel redaction review accepted, 2026-11-05",
+      "historical": true
     },
     {
       "path": "docs/portfolio/images/CP-03-validation.png",
       "sha256": "6782b5f8acc6f040efa60419defd09c521fbe6d606c0ca64808332ecbc2c08a4",
-      "privacy_review": "Codex, 2026-11-05; individual visible-pixel review accepted",
-      "historical": true,
-      "original_capture_relative_path": "screenshots/reviewer/LANGSMITH_CORRECTED_2026-11-02/CP-03-validation.png"
+      "privacy_review": "Individual visible-pixel redaction review accepted, 2026-11-05",
+      "historical": true
     },
     {
       "path": "docs/portfolio/images/CP07_CLOUDWATCH_RESTART_VERIFICATION.jpg",
       "sha256": "573d6bd96db2988c13f9596240db8368048a0964a48bc35dfee289038dea3372",
-      "privacy_review": "Codex, 2026-11-05; individual visible-pixel review accepted",
-      "historical": true,
-      "original_capture_relative_path": "screenshots/private/2026-11-05/CP07_CLOUDWATCH_RESTART_VERIFICATION.jpg"
+      "privacy_review": "Individual visible-pixel redaction review accepted, 2026-11-05",
+      "historical": true
     },
     {
       "path": "docs/portfolio/images/CP-04-awaiting-approval.jpg",
       "sha256": "48937f7d3de3075b7589ecd7ac1a9e15638be22d7383b775c740678c4b59151c",
-      "privacy_review": "Codex, 2026-11-05; individual visible-pixel review accepted",
-      "historical": true,
-      "original_capture_relative_path": "screenshots/reviewer/PHASE3_FINAL_2026-11-03/CP-04-awaiting-approval.jpg"
+      "privacy_review": "Individual visible-pixel redaction review accepted, 2026-11-05",
+      "historical": true
     },
     {
       "path": "docs/portfolio/images/CP-02-usage.png",
       "sha256": "55eb8f1aa40956e24743619b85a775f6dcef33e6e6f5df4e613a5b10128fe748",
-      "privacy_review": "Codex, 2026-11-05; individual visible-pixel review accepted",
-      "historical": true,
-      "original_capture_relative_path": "screenshots/reviewer/LANGSMITH_CORRECTED_2026-11-02/CP-02-usage.png"
+      "privacy_review": "Individual visible-pixel redaction review accepted, 2026-11-05",
+      "historical": true
     },
     {
       "path": "docs/portfolio/images/CP-05-committed.jpg",
       "sha256": "60e4587965911c9dbba10f17b985e1d2c845a272a7e504e621eef397a9427ef5",
-      "privacy_review": "Codex, 2026-11-05; individual visible-pixel review accepted",
-      "historical": true,
-      "original_capture_relative_path": "screenshots/reviewer/PHASE3_FINAL_2026-11-03/CP-05-committed.jpg"
+      "privacy_review": "Individual visible-pixel redaction review accepted, 2026-11-05",
+      "historical": true
     },
     {
       "path": "docs/portfolio/images/CP-05-recovered-pending.jpg",
       "sha256": "dc8865a21399a9ccc655616ca5109f196d7a57fe692e6886ed344aafe3c5e232",
-      "privacy_review": "Codex, 2026-11-05; individual visible-pixel review accepted",
-      "historical": true,
-      "original_capture_relative_path": "screenshots/reviewer/PHASE3_FINAL_2026-11-03/CP-05-recovered-pending.jpg"
+      "privacy_review": "Individual visible-pixel redaction review accepted, 2026-11-05",
+      "historical": true
     }
-  ],
-  "publication_performed": false
+  ]
 }

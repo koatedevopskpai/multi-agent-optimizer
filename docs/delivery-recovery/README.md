@@ -1,11 +1,5 @@
-# Delivery Recovery Assistant engineering references
+# Delivery recovery contracts
 
-Start with the [current portfolio guide](../portfolio/START_HERE.md). The SQLite application, historical AWS recovery path and billable cleanup are delivered within their documented limits. PostgreSQL test and production remain future work.
+The [OpenAPI contract](openapi-phase3.json) describes the API. The [review-receipt schema](phase4-independent-review-receipt.schema.json) describes an integrity input used by the guarded operational tooling; it is not an actual receipt or authorization.
 
-This directory retains adapted design, contract, IAM and historical runbook material for code/test context. Historical phase decisions are not current authorization, current cloud inventory or turnkey deployment bundles. Original byte-preserved records remain privately archived.
-
-- [Database roadmap](ADR_DATABASE_ENVIRONMENT_ROADMAP.md)
-- [OpenAPI contract](openapi-phase3.json)
-- [Historical requirement mapping](requirements_traceability.csv)
-- [Local durability reference](PHASE3_RUNBOOK.md)
-- [Current evidence summary](../portfolio/QUALITY_AND_EVIDENCE.md)
+Start with the [engineering tour](../portfolio/START_HERE.md), [decisions](../portfolio/DECISIONS.md), [evidence](../portfolio/QUALITY_AND_EVIDENCE.md) and [reference operations](../operations/REFERENCE_OPERATIONS.md). The application currently uses SQLite; PostgreSQL test is planned and production remains outside scope.

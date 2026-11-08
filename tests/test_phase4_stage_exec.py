@@ -174,18 +174,6 @@ def test_missing_command_does_not_invoke_runner():
 
 
 def test_runbooks_route_cli_and_terraform_through_the_stage_runner():
-    paths = [
-        REPO / "docs/delivery-recovery/PHASE4_ACCESS_AND_SEQUENCE.md",
-        REPO / "docs/delivery-recovery/runbooks/deploy.md",
-        REPO / "docs/delivery-recovery/runbooks/teardown.md",
-        REPO / "docs/delivery-recovery/runbooks/recreation.md",
-    ]
-    text = "\n".join(path.read_text(encoding="utf-8") for path in paths)
-    assert "phase4_stage_exec.py" in text
-    assert "phase4_stage_preflight.py" not in text
-    assert "if ($LASTEXITCODE -ne 0)" in text
-    assert "aws ssm start-session" in text
-    assert "aws ec2 create-snapshot" in text
-    assert "aws ecr get-login-password" in text
-    assert "aws ecr describe-images" in text
-    assert "does not change the caller's PowerShell environment" in " ".join(text.split())
+    text = (REPO / "docs/operations/REFERENCE_OPERATIONS.md").read_text(encoding="utf-8")
+    for term in ("phase4_stage_exec.py", "if ($LASTEXITCODE -ne 0)", "expected account", "expected role", "same child process"):
+        assert term in text

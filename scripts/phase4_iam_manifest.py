@@ -17,7 +17,7 @@ from phase4_iam_manifest_schema import SCHEMA, validate_manifest
 REPO = Path(__file__).resolve().parents[1]
 RENDERED = REPO / "var" / "phase4" / "iam"
 PRIVATE_MANIFEST = RENDERED / "active-manifest.json"
-PUBLIC_MANIFEST = REPO / "docs" / "delivery-recovery" / "phase4-active-iam-manifest.json"
+REPORT_MANIFEST = RENDERED / "review-manifest.json"
 TERRAFORM_MAIN = REPO / "infra" / "terraform" / "main.tf"
 
 ACTIVE = {
@@ -115,7 +115,7 @@ def main() -> int:
         encoding="utf-8",
         newline="\n",
     )
-    PUBLIC_MANIFEST.write_text(
+    REPORT_MANIFEST.write_text(
         json.dumps(document, indent=2, sort_keys=True) + "\n",
         encoding="utf-8",
         newline="\n",
@@ -127,7 +127,7 @@ def main() -> int:
                 "active_document_count": document["active_document_count"],
                 "excluded_optional_oidc_count": document["excluded_optional_oidc_count"],
                 "private_manifest": str(PRIVATE_MANIFEST.relative_to(REPO)),
-                "public_manifest": str(PUBLIC_MANIFEST.relative_to(REPO)),
+                "review_manifest": str(REPORT_MANIFEST.relative_to(REPO)),
             },
             indent=2,
             sort_keys=True,

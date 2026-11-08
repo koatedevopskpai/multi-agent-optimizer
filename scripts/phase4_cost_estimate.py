@@ -10,7 +10,7 @@ import json
 from pathlib import Path
 
 REPO = Path(__file__).resolve().parents[1]
-DOCS = REPO / "docs" / "delivery-recovery"
+DOCS = REPO / "var" / "phase4" / "cost-reports"
 
 USD_TO_GBP = 0.74519
 VAT_RATE = 0.20
@@ -60,12 +60,9 @@ RATES = {
     },
 }
 
-# Conservative lifecycle: two bounded sessions, short residual retention, then
-# teardown. The interview is not scheduled, so no idle cloud infrastructure is
-# planned during the waiting period.
+# Illustrative lab lifecycle, not an owner spending approval or measured bill.
 SCENARIO = {
     "compute_hours": 32.0,
-    "interview_deployment_hours": 8.0,
     "root_gb": 10.0,
     "data_gb": 20.0,
     "ebs_days": 14.0,
@@ -136,8 +133,6 @@ def main() -> int:
         "fx_source": "Frankfurter API USD->GBP 2026-11-02",
         "includes_vat": True,
         "vat_rate": VAT_RATE,
-        "approved_total_ceiling_gbp": 20.0,
-        "stop_threshold_gbp": 12.0,
         "scenario": s,
         "credit_mode": "standard",
         "rates": RATES,
@@ -154,18 +149,16 @@ def main() -> int:
         "total_gbp": round(total_gbp, 4),
         "contingency_multiplier": s["contingency_multiplier"],
         "contingency_total_gbp": round(contingency_gbp, 4),
-        "remaining_below_ceiling_gbp": round(20.0 - total_gbp, 4),
         "hourly_while_running_gbp": round(hourly_while_running_gbp, 6),
         "stopped_daily_gbp": round(stopped_daily_gbp, 6),
         "assumptions": [
             "One t4g.medium instance in Standard CPU-credit mode; no Unlimited surplus charges are budgeted. Sustained CPU bursts can be throttled.",
-            "32 running hours covers deployment, smoke, failure/recovery, rollback, backup/restore, one recreation rehearsal and an 8-hour interview deployment.",
+            "Illustrative 32-hour compute allowance for a disposable engineering lab.",
             "No NAT gateway, load balancer, VPC interface endpoint, Elastic IP or long-lived cloud backup.",
             "Public IPv4 is released when the instance stops; no Elastic IP is allocated.",
             "ECR and the log group are deleted at teardown; images are rebuilt from source and digest references for recreation.",
             "14 residual days are a conservative allowance between deployment and teardown; the waiting period retains no project cloud infrastructure.",
             "VAT is 20% and the USD/GBP rate is the recorded 2026-11-02 reference; actual billing may vary.",
-            "The GBP20 ceiling is a user-approved spending limit, not an AWS Budget enforced cap. The operational stop threshold is GBP12.",
         ],
     }
     provenance_path = DOCS / "phase4-pricing-provenance.json"
@@ -181,69 +174,15 @@ def main() -> int:
         newline="\n",
     )
 
-    rows = [
-        "| Line | USD | GBP (ex VAT) |",
-        "|---|---:|---:|",
-    ]
-    for name, value in line_items_usd.items():
-        rows.append(f"| {name} | ${value:.4f} | £{value * USD_TO_GBP:.4f} |")
-    rows += [
-        f"| **Compute + public IPv4** | **${compute_and_address_usd:.4f}** | **£{compute_and_address_usd * USD_TO_GBP:.4f}** |",
-        f"| **Retained storage/logs/snapshot** | **${retained_recurring_usd:.4f}** | **£{retained_recurring_usd * USD_TO_GBP:.4f}** |",
-        f"| **Subtotal** | **${subtotal_usd:.4f}** | **£{subtotal_gbp:.4f}** |",
-        f"| VAT (20%) | | £{vat_gbp:.4f} |",
-        f"| **Total incl. VAT** | | **£{total_gbp:.4f}** |",
-        f"| 3x contingency | | £{contingency_gbp:.4f} |",
-    ]
-    markdown = f"""# Phase 4 London cost estimate
-
-Generated from `scripts/phase4_cost_estimate.py` on 3 November 2026. Region:
-`eu-west-2`. Currency: GBP, including 20% VAT. USD/GBP reference
-`{USD_TO_GBP}` from Frankfurter on 2 November 2026.
-
-This is an estimate, not a bill or an AWS-enforced cap. The user-approved total
-ceiling is **£20**; the operational stop threshold is **£12** to leave room for
-billing delay, tax and cleanup.
-
-Dated official price dimensions and FX provenance are in
-`phase4-pricing-provenance.json`. The internet-egress line is explicitly an
-assumption, not a retrieved price.
-
-## Scenario
-
-- One `t4g.medium` instance in **Standard CPU-credit mode** for **{s['compute_hours']:.0f} hours** across
-  deployment, drills, rollback, restore, one recreation rehearsal and an
-  8-hour interview deployment. Standard mode has no Unlimited surplus charge,
-  but sustained bursts may be throttled.
-- Public IPv4 for the same **{s['public_ipv4_hours']:.0f} hours** while running.
-- Encrypted gp3 storage: {s['root_gb']:.0f} GB root + {s['data_gb']:.0f} GB data,
-  retained for up to {s['ebs_days']:.0f} days before teardown.
-- One short snapshot drill ({s['snapshot_gb']:.0f} GB for {s['snapshot_days']:.0f} days).
-- ECR image {s['ecr_gb']:.1f} GB for {s['ecr_days']:.0f} days, then deleted.
-- CloudWatch Logs: {s['log_ingest_gb']:.1f} GB ingest, {s['log_storage_gb']:.1f} GB stored for {s['log_days']:.0f} days.
-- 1 GB internet egress allowance; no NAT gateway or load balancer.
-
-{chr(10).join(rows)}
-
-Running cost: **£{hourly_while_running_gbp:.4f}/hour** (compute + public IPv4
-incl. VAT). Stopped residual cost: **£{stopped_daily_gbp:.4f}/day** (EBS, ECR,
-log storage; excl. snapshots).
-
-The 3x contingency total is **£{contingency_gbp:.4f}**, still below the £20
-ceiling. This estimate must be revised if instance size, session length,
-retention, NAT, load balancing or interface endpoints change.
-"""
-    (DOCS / "PHASE4_COST_ESTIMATE.md").write_text(
-        markdown, encoding="utf-8", newline="\n"
+    markdown = (
+        "# Illustrative cloud cost estimate\n\n"
+        "Dated example inputs; refresh prices, exchange rate, tax and retention before use. "
+        "This is neither a measured bill nor a spending authorization.\n\n"
+        f"Estimated total incl. VAT: GBP{total_gbp:.4f}; "
+        f"contingency example: GBP{contingency_gbp:.4f}.\n"
     )
-    print(json.dumps(
-        {
-            "total_gbp": estimate["total_gbp"],
-            "contingency_total_gbp": estimate["contingency_total_gbp"],
-            "stop_threshold_gbp": estimate["stop_threshold_gbp"],
-        },
-        indent=2,
-    ))
+    (DOCS / "cost-estimate.md").write_text(markdown, encoding="utf-8")
+    print(json.dumps({"total_gbp": estimate["total_gbp"], "contingency_total_gbp": estimate["contingency_total_gbp"]}, indent=2))
     return 0
 
 

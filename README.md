@@ -4,7 +4,7 @@
 
 An engineering portfolio project by Koate Kpai, built on the `multi-agent-optimizer` Critical Path Method engine. It combines deterministic scheduling, LangGraph orchestration, human approval, React and a bounded AWS recovery demonstration.
 
-> Synthetic interview reference. Code computes scheduling and cost facts; the model explains verified facts. Current persistence is single-instance SQLite development. PostgreSQL test is planned; production is outside the delivered scope.
+> Synthetic engineering reference. Code computes scheduling and cost facts; the model explains verified facts. Current persistence is single-instance SQLite development. PostgreSQL test is planned; production is outside the delivered scope.
 
 ## The business decision
 
@@ -32,7 +32,7 @@ Every candidate is recomputed. Approval binds the project version, input hash an
 - [Architecture and decisions](docs/portfolio/ARCHITECTURE.md)
 - [Business case and success scenarios](docs/portfolio/BUSINESS_CASE.md)
 - [Quality requirements and evidence](docs/portfolio/QUALITY_AND_EVIDENCE.md)
-- [45-minute demonstration](docs/portfolio/DEMO_GUIDE.md)
+- [Reference operations](docs/operations/REFERENCE_OPERATIONS.md)
 - [Preserved audit trail and provenance](docs/portfolio/PROVENANCE.md)
 
 ## Run locally
@@ -77,4 +77,4 @@ npm --prefix web run build
 
 No scale-out, HA, host/volume-loss recovery, enterprise federation or production deployment claim. PostgreSQL is the next test-environment stage. Frozen holdout evaluation, production load profile and AWS recreation rehearsal remain uncompleted. Historical container findings were recorded; any new deployment needs a current scan/disposition.
 
-The original audit branch and full history remain private and unchanged. This branch is a curated derivative with reviewed images and explicit provenance. [MIT licence](LICENSE).
+Detailed development records are preserved separately. This public snapshot includes reviewed images and explicit evidence provenance. [MIT licence](LICENSE).

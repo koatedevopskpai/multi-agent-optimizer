@@ -1,10 +1,5 @@
-# Phase 2 evaluation cases
+# Synthetic workflow evaluation cases
 
-These are synthetic fake-provider cases for the bounded workflow.
+These public fake-provider cases exercise bounded workflow behavior. `development_cases.json` is used by the offline test suite. `holdout_cases.json` retains the original frozen case definitions for reproducibility; because it is published, it is not a hidden or blind assessment for readers who have seen it.
 
-- `development_cases.json` is used during development and in the offline test suite.
-- `holdout_cases.json` is frozen metadata and must not be used for prompt tuning or development iteration.
-
-The holdout cases are listed but not executed in this increment. No real provider
-or LangSmith run is claimed. A live-model evaluation remains pending provider
-access and spending authority.
+No executed holdout benchmark or live-model quality claim is established by publishing these definitions. A future blind evaluation needs a separately held set, recorded before execution and reported with actual results.
